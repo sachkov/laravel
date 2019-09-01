@@ -12,6 +12,8 @@
 
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="{{ asset('css/prayers.css') }}" rel="stylesheet">
 </head>
 <body>
     <div id="app">
@@ -76,5 +78,7 @@
 
     <!-- Scripts -->
     <script src="{{ asset('js/app.js') }}"></script>
+    <!-- Custom scripts -->
+    <script src="{{ asset('js/prayers.js') }}"></script>
 </body>
 </html>
