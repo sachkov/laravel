@@ -18,3 +18,6 @@ Route::get('/', function () {
 Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
+
+//Проверочный маршрут к тестовой странице
+Route::match(["get", "post"], '/test', 'TestController@start')->name('test');

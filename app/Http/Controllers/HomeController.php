@@ -25,4 +25,12 @@ class HomeController extends Controller
     {
         return view('home');
     }
+    
+    /**
+     * Тестовая страница для отработки методов
+     */
+    public function testpage()
+    {
+        return view('test');
+    }
 }
