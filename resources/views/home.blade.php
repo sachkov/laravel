@@ -1,14 +1,15 @@
 @extends('layouts.mn_section')
 
 @section('content')
-<form>
+<form id="create-form">
+    <input type="hidden" id="x_token" value="{{ csrf_token() }}">
     <div class="form-group">
         <label for="input-name">Наименование</label>
         <input type="text" class="form-control" id="input-name" placeholder="Заголовок 'о чем' или 'о ком'">
     </div>
 
     <div class="form-group">
-        <label for="sel-groups">Группы</label>
+        <label for="sel-groups">Видно группам</label>
         <select multiple class="form-control" id="sel-groups">
             <option>Вся церковь</option>
             <option>Малая группа</option>
@@ -17,13 +18,18 @@
         </select>
     </div>
     <div class="form-group">
+        <label for="input-name">Видно людям</label>
+        <input type="text" class="form-control" id="input-user" placeholder="Начните вводить имя или фамилию">
+    </div>
+    <div class="form-group">
         <label for="textarea-descr">Описание</label>
         <textarea class="form-control" id="textarea-descr" rows="3"></textarea>
     </div>
-    <div class="form-group">
+    <?/*<div class="form-group">
         <label for="input-name">Действует до</label>
-        <input type="text" class="form-control" id="input-name" placeholder="Дата окончания, если исвестно">
-    </div>
+        <input type="text" class="form-control" id="input-date" placeholder="Дата окончания, если исвестно">
+    </div>*/?>
+    <button type="submit" id="btn-save-mn" class="btn btn-success">Сохранить</button>
 </form>
 <div class="d-flex justify-content-end my-3">
     <button type="button" id="btn-add-mn" class="btn btn-success">Добавить</button>

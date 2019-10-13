@@ -21,3 +21,6 @@ Route::get('/home', 'HomeController@index')->name('home');
 
 //Проверочный маршрут к тестовой странице
 Route::match(["get", "post"], '/test', 'TestController@start')->name('test');
+
+//Маршрут обработки ajax запросов
+Route::post('/ajax/saveMN', 'AjaxController@saveMN');
