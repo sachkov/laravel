@@ -13,7 +13,7 @@ class CreateMnTable extends Migration
      */
     public function up()
     {
-        Schema::table('mn', function (Blueprint $table) {
+        Schema::create('mn', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name', 100);
             $table->text('description')->nullable();

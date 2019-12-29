@@ -7,7 +7,7 @@ use Illuminate\Database\Migrations\Migration;
 class CreateMnUserRsTable extends Migration
 {
     /**
-     * Таблица 
+     * Таблица связей молитвенных нужд и пользователей, которым открыта данная нужда
      *
      * @return void
      */

@@ -5,91 +5,43 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>Laravel</title>
+        <title>Пробуждение</title>
 
         <!-- Fonts -->
         <link href="https://fonts.googleapis.com/css?family=Raleway:100,600" rel="stylesheet" type="text/css">
 
-        <!-- Styles -->
-        <style>
-            html, body {
-                background-color: #fff;
-                color: #636b6f;
-                font-family: 'Raleway', sans-serif;
-                font-weight: 100;
-                height: 100vh;
-                margin: 0;
-            }
-
-            .full-height {
-                height: 100vh;
-            }
-
-            .flex-center {
-                align-items: center;
-                display: flex;
-                justify-content: center;
-            }
-
-            .position-ref {
-                position: relative;
-            }
-
-            .top-right {
-                position: absolute;
-                right: 10px;
-                top: 18px;
-            }
-
-            .content {
-                text-align: center;
-            }
-
-            .title {
-                font-size: 84px;
-            }
-
-            .links > a {
-                color: #636b6f;
-                padding: 0 25px;
-                font-size: 12px;
-                font-weight: 600;
-                letter-spacing: .1rem;
-                text-decoration: none;
-                text-transform: uppercase;
-            }
-
-            .m-b-md {
-                margin-bottom: 30px;
-            }
-        </style>
+        <link href="{{ asset('css/prayers.css') }}" rel="stylesheet">
     </head>
-    <body>
-        <div class="flex-center position-ref full-height">
+    <body class="welcome-body">
+        <div class="welcome-scr bg-mountains">
+            
+            <div class="quotes-cont">
+                <p class="quote">В начале было Слово, и Слово было у Бога, и Слово было Бог.</p>
+                <p class="quote">Итак во всем, как хотите, чтобы с вами поступали люди, так поступайте и вы с ними</p>
+                <p class="quote">Ибо весь закон в одном слове заключается: люби ближнего твоего, как самого себя.</p>
+                <p class="quote">Воззови ко Мне - и Я отвечу тебе, покажу тебе великое и недоступное, чего ты не знаешь.</p>
+            </div>
             @if (Route::has('login'))
-                <div class="top-right links">
+                <div class="top-right-links">
                     @if (Auth::check())
-                        <a href="{{ url('/home') }}">Home</a>
+                        <a class="link" href="{{ url('/home') }}">Мои молитвы</a>
                     @else
-                        <a href="{{ url('/login') }}">Login</a>
-                        <a href="{{ url('/register') }}">Register</a>
+                        <a class="link" href="{{ url('/login') }}">Войти</a>
+                        <a class="link" href="{{ url('/register') }}">Зарегистрироваться</a>
                     @endif
                 </div>
             @endif
 
-            <div class="content">
-                <div class="title m-b-md">
-                    Laravel
-                </div>
-
-                <div class="links">
-                    <a href="https://laravel.com/docs">Documentation</a>
-                    <a href="https://laracasts.com">Laracasts</a>
-                    <a href="https://laravel-news.com">News</a>
-                    <a href="https://forge.laravel.com">Forge</a>
-                    <a href="https://github.com/laravel/laravel">GitHub</a>
-                </div>
-            </div>
         </div>
+        <script>
+            let quotesCont = document.querySelector(".quotes-cont");
+            let interval = 1000;
+            let timerId = setTimeout(function tick() {
+                let quote = document.querySelector(".quote:first-child");
+                quotesCont.appendChild(quote);
+                interval += 1000;
+                timerId = setTimeout(tick, interval);
+            }, interval);
+        </script>
     </body>
 </html>

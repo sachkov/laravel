@@ -8,77 +8,74 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Laravel') }}</title>
+    <title>Пробуждение</title>
 
     <!-- Styles -->
     <link href="{{ asset('css/bootstrap.css') }}" rel="stylesheet">
     <!-- Custom CSS -->
     <link href="{{ asset('css/prayers.css') }}" rel="stylesheet">
+    <!-- Jquery UI CSS -->
+    <link href="{{ asset('css/jquery-ui.min.css') }}" rel="stylesheet">
+    <title>Мои нужды</title>
 </head>
-<body>
-    <div id="mn-sections">
-        <nav class="navbar navbar-default navbar-static-top">
-            <div class="container">
-                <div class="navbar-header">
-
-                    <!-- Collapsed Hamburger -->
-                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#app-navbar-collapse">
-                        <span class="sr-only">Toggle Navigation</span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </button>
-
-                    <!-- Branding Image -->
-                    <a class="navbar-brand" href="{{ url('/') }}">
-                        {{ config('app.name', 'Laravel') }}
-                    </a>
-                </div>
-
-                <div class="collapse navbar-collapse" id="app-navbar-collapse">
-                    <!-- Left Side Of Navbar -->
-                    <ul class="nav navbar-nav">
-                        &nbsp;
-                    </ul>
-
-                    <!-- Right Side Of Navbar -->
-                    <ul class="nav navbar-nav navbar-right">
-                        <!-- Authentication Links -->
+<body class="h-full">
+    <div class="body-page flex flex-col	h-full">
+        <header class="bg-grey flex-1 header-piсture">
+            <div class="container mx-auto">
+                <div class="header-first-line">
+                    <div class="header-logo">
+                        <img class="" src="img/cross.png" alt="logo-cross"/>
+                        <div class="church-name">
+                            <span class="name">пробуждение</span>
+                            <span class="description">церковь евангельских христиан</span>
+                        </div>
+                        
+                    </div>
+                    <label for="menu-checkbox">
+                        <img class="mobile-menu" src="img/icons8-menu-filled.svg" alt="menu">
+                    </label>
+                    <input id="menu-checkbox" type="checkbox" style="display: none;"/>
+                    <div class="enter_link">
                         @if (Auth::guest())
-                            <li><a href="{{ route('login') }}">Login</a></li>
-                            <li><a href="{{ route('register') }}">Register</a></li>
+                            <a class="list" href="{{ route('login') }}">Войти</a>
+                            <a class="list" href="{{ route('register') }}">Зарегистрироваться</a>
                         @else
-                            <li class="dropdown">
-                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-                                    {{ Auth::user()->name }} <span class="caret"></span>
-                                </a>
-
-                                <ul class="dropdown-menu" role="menu">
-                                    <li>
-                                        <a href="{{ route('logout') }}"
-                                            onclick="event.preventDefault();
-                                                     document.getElementById('logout-form').submit();">
-                                            Logout
-                                        </a>
-
-                                        <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                                            {{ csrf_field() }}
-                                        </form>
-                                    </li>
-                                </ul>
-                            </li>
+                            <span class="list">{{ Auth::user()->name }}</span>
+                            <a class="list" href="/list">Список</a>
+                            <a class="list" href="/list">Мои молитвы</a>
+                            <a class="list" href="{{ route('logout') }}"
+                                onclick="event.preventDefault();
+                                document.getElementById('logout-form').submit();">
+                                Выход
+                            </a>
+                            <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                                {{ csrf_field() }}
+                            </form>
                         @endif
-                    </ul>
+                    </div>
                 </div>
             </div>
-        </nav>
-
-        @yield('content')
+        </header>
+        <div class="main-section bg-yellow-lightest flex-1">
+            <div class="container mx-auto">
+           @yield('content')
+            </div>
+        </div>
+        <footer class="flex-none">
+            <div class="container footer mx-auto">
+                <!--<div class="contacts">
+                    <p>г. Тольятти, улица Липовая 16</p>
+                    <p>тел. 8 (8482) 20-85-98</p>
+                    <p>Email : vitalela@gmail.com</p>
+                </div>-->
+            </div>
+        </footer>
     </div>
-
     <!-- Scripts -->
     <script src="{{ asset('js/app.js') }}"></script>
     <!-- Custom scripts -->
     <script src="{{ asset('js/prayers.js') }}"></script>
+     <!-- JQuery UI scripts -->
+    <script src="{{ asset('js/jquery-ui.min.js') }}"></script>
 </body>
 </html>

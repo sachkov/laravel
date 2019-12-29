@@ -23,7 +23,16 @@ class HomeController extends Controller
      */
     public function index()
     {
-        return view('home');
+        //return view('home', []);
+        $MN_model = new \App\Models\MN;
+        //$arMN = $MN_model::all();
+        $arMN = $MN_model::whereNull('end_date')
+            ->orderBy('updated_at', 'desc')
+            ->take(15)
+            ->get();
+        
+        return view('home', ["arMN"=>$arMN]);
+        
     }
     
     /**

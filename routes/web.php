@@ -24,3 +24,11 @@ Route::match(["get", "post"], '/test', 'TestController@start')->name('test');
 
 //Маршрут обработки ajax запросов
 Route::post('/ajax/saveMN', 'AjaxController@saveMN');
+
+Route::post('/ajax/editMN', 'AjaxController@editMN');
+
+Route::post('/ajax/doneMN', 'AjaxController@doneMN');
+
+Route::post('/ajax/getTable', 'AjaxController@getTable');
+
+Route::post('/ajax/getUsers', 'AjaxController@getUsers');
