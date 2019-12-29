@@ -3,9 +3,7 @@
         <div class="row">
             <div class="col-md-8 col-md-offset-2">
                 <div class="panel panel-default">
-                    <div class="panel-heading">Example Component2</div>
-
-
+                    Test COMPONENT
                 </div>
             </div>
         </div>
@@ -14,8 +12,9 @@
 
 <script>
     export default {
-        mounted() {
-            console.log('Component mounted.')
+        created: function() {
+            console.log('Component TEST.');
+            
         }
     }
 </script>

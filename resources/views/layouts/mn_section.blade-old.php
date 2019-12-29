@@ -11,12 +11,15 @@
     <title>{{ config('app.name', 'Laravel') }}</title>
 
     <!-- Styles -->
-    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/bootstrap.css') }}" rel="stylesheet">
     <!-- Custom CSS -->
     <link href="{{ asset('css/prayers.css') }}" rel="stylesheet">
+    <!-- Jquery UI CSS -->
+    <link href="{{ asset('css/jquery-ui.min.css') }}" rel="stylesheet">
+    <title>Мои нужды</title>
 </head>
 <body>
-    <div id="app">
+    <div id="mn-sections">
         <nav class="navbar navbar-default navbar-static-top">
             <div class="container">
                 <div class="navbar-header">
@@ -80,5 +83,7 @@
     <script src="{{ asset('js/app.js') }}"></script>
     <!-- Custom scripts -->
     <script src="{{ asset('js/prayers.js') }}"></script>
+     <!-- JQuery UI scripts -->
+    <script src="{{ asset('js/jquery-ui.min.js') }}"></script>
 </body>
 </html>
