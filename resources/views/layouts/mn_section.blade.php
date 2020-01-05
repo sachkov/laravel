@@ -8,15 +8,13 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>Пробуждение</title>
-
     <!-- Styles -->
     <link href="{{ asset('css/bootstrap.css') }}" rel="stylesheet">
     <!-- Custom CSS -->
     <link href="{{ asset('css/prayers.css') }}" rel="stylesheet">
     <!-- Jquery UI CSS -->
     <link href="{{ asset('css/jquery-ui.min.css') }}" rel="stylesheet">
-    <title>Мои нужды</title>
+    <title>@yield('title')</title>
 </head>
 <body class="h-full">
     <div class="body-page flex flex-col	h-full">
@@ -41,8 +39,8 @@
                             <a class="list" href="{{ route('register') }}">Зарегистрироваться</a>
                         @else
                             <span class="list">{{ Auth::user()->name }}</span>
-                            <a class="list" href="/list">Список</a>
-                            <a class="list" href="/list">Мои молитвы</a>
+                            <a class="list" href="{{route('home')}}">Мои нужды</a>
+                            <a class="list" href="{{route('list')}}">Молитвы</a>
                             <a class="list" href="{{ route('logout') }}"
                                 onclick="event.preventDefault();
                                 document.getElementById('logout-form').submit();">
@@ -74,7 +72,7 @@
     <!-- Scripts -->
     <script src="{{ asset('js/app.js') }}"></script>
     <!-- Custom scripts -->
-    <script src="{{ asset('js/prayers.js') }}"></script>
+    @yield('script')
      <!-- JQuery UI scripts -->
     <script src="{{ asset('js/jquery-ui.min.js') }}"></script>
 </body>

@@ -32,7 +32,7 @@ $( document ).ready(function(){
 
     //Нажатие на "Добавить"
     $("#btn-add-mn").on("click",function(){
-        $(this).hide();
+        $(this).parent().hide();
         $("#create-form").show();
     });
     //Нажатие на "Сохранить" (Добавление МН)
@@ -43,7 +43,7 @@ $( document ).ready(function(){
     //Нажатие на Отменить (Добавление МН)
     $("#btn-cancel-mn").on("click",function(event){
         $("#create-form").hide();
-        $("#btn-add-mn").show();
+        $("#btn-add-mn").parent().show();
         $("#input-name").val("");
         $("#textarea-descr").val("");
         $("#input-user").val("");
@@ -65,17 +65,17 @@ $( document ).ready(function(){
     $(".mn-show").on("click",function(){
         if($(this).hasClass("active")){
             $(this).removeClass("active");
-            $(this).html("Показать описание");
-            $("#desc-"+$(this).parents("tr.main").data("mnid")).hide();
+            $(this).find("span").html("Показать описание");
+            $("#desc-"+$(this).parents(".t-tr").data("mnid")).hide();
         }else{
             $(this).addClass("active");
-            $(this).html("Скрыть описание");
-            $("#desc-"+$(this).parents("tr.main").data("mnid")).show();
+            $(this).find("span").html("Скрыть описание");
+            $("#desc-"+$(this).parents(".t-tr").data("mnid")).show();
         }
     });
     //Открытие формы редактирования или удаления
     $(".mn-act").on("click",function(){
-        var id = $(this).parents("tr.main").data("mnid");
+        var id = $(this).parents(".t-tr").data("mnid");
         var act = $(this).data("act");
         console.log(id+" / "+act);
         var MN;
@@ -91,12 +91,12 @@ $( document ).ready(function(){
             $("#container-"+id).hide();  //скрываем контейнер для формы редактирования/удаления
             MNeditID = 0;
         }else{
-            $("#container-td-"+id+">div").hide();   //Убераем формы которые остались показаны если была нажата
+            $("#container-"+id+">div").hide();   //Убераем формы которые остались показаны если была нажата
             $(this).siblings(".mn-act.active").removeClass("active"); //кнопка редактировать сразу после завершить
             $(this).addClass("active");
             $("."+act+"-form")
                 .show()
-                .appendTo($("#container-td-"+id));
+                .appendTo($("#container-"+id));
             
             MNeditID = id;
             if(act == "done" && MN.is_thanks == 1){
@@ -104,21 +104,23 @@ $( document ).ready(function(){
                 return true;
             }
             //Вставка значений
-            $("#name-"+act).val($(this).parents("tr.main").find("td[title='Название']").html());
-            $("#descr-"+act).val($("#desc-"+$(this).parents("tr.main").data("mnid")).find("td").html());
+            $("#name-"+act).val($(this).parents(".t-tr").find(".t-name").html());
+            $("#descr-"+act).val($(this).parents(".mn-item").find(".mn-description>p").html());
             
             vm.edit_users_table = MN.users;
             
             if(MN.is_thanks == 1){
                 $("#name-edit").prop("readonly", true);
                 $("#descr-edit").prop("readonly", true);
-                $("#result-egit-form").show();
-                $("#result-egit").val(MN.answer);
+                $("#result-edit-form").show();
+                $("#result-edit").val(MN.answer);
+                $("#share-edit").hide();
             }else{
                 $("#name-edit").prop("readonly", false);
                 $("#descr-edit").prop("readonly", false);
-                $("#result-egit-form").hide();
-                $("#result-egit").val("");
+                $("#result-edit-form").hide();
+                $("#result-edit").val("");
+                $("#share-edit").show();
             }
             $("#result-done").removeClass("is-invalid");
             $("#container-"+id).show();
@@ -219,7 +221,7 @@ function saveMN(){
         },
         success: function(data){
             $("#create-form").hide();
-            $("#btn-add-mn").show();
+            $("#btn-add-mn").parent().show();
             console.log(data);
             console.log(data.success);
         },
@@ -279,7 +281,7 @@ function saveDoneForm(done = false){
         success: function(data){
             //Изменение значений в таблице и закрытие формы редактирования
             closeDoneForm();
-            if(!re_publish) $("tr.main[data-mnid="+id+"]").hide();
+            if(!re_publish) $(".t-tr[data-mnid="+id+"]").hide();
         },
         error: function(data) {
             console.log("doneMN error");
@@ -320,7 +322,7 @@ function editMN(){
         },
         success: function(data){
             //Изменение значений в таблице и закрытие формы редактирования
-            $("tr.main[data-mnid='"+MNeditID+"'] td.main-name").html(name);
+            $(".t-tr[data-mnid='"+MNeditID+"'] .t-name").html(name);
             $("#desc-"+MNeditID+" td").html(description);
             closeEditForm();
         },

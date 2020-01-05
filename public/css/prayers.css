@@ -1,3 +1,71 @@
+/*Prayers*/
+.prayers-main-table{
+    width: 100%;
+    margin-bottom: 1rem;
+    color: #212529;
+    border-collapse: collapse;
+}
+.prayers-main-table .t-tr{
+    width: 100%;
+    padding: 7px;
+    border-bottom: 1px solid #D3D3D3;
+    display: flex;
+}
+.prayers-main-table .t-name{
+    flex-grow: 1;
+    flex-shrink: 10;
+}
+.prayers-main-table .t-date{
+    width: 100px;
+}
+.prayers-main-table .t-action{
+    width: 360px;
+    flex-shrink: 0;
+}
+
+.prayers-list{padding-top: 10px;}
+.prayers-list .prayes{
+    border: 1px solid black;
+    border-radius: 10px;
+    padding: 5px;
+    margin-bottom: 5px;
+}
+.prayers-list .prayes{
+    display: flex;
+    padding: 10px;
+}
+.prayers-list .time-column{
+    max-width: 90px;
+    font-style: italic;
+    margin-right: 5px;
+}
+.prayers-list .time-column .time.from{
+    padding-bottom: 5px;
+    border-bottom: 2px solid gray;
+    margin: 0;
+}
+.prayers-list .time-column .time.at{
+    font-weight: bold;
+    font-style: normal;
+    padding-top: 3px;
+    margin: 0;
+}
+.prayers-list .text-column p{
+    margin-bottom: 5px;
+}
+.prayers-list .header{
+    font-weight: bold;
+}
+.prayers-list .header>span:first-child{
+    margin-right: 10px;
+}
+.prayers-list .answer-date{
+    font-weight: bold;
+    padding-right: 10px;
+}
+
+/*prayers end*/
+
 .welcome-body{margin: 0;}
 .welcome-scr{
     align-items: center;
@@ -45,12 +113,22 @@
 }
 .welcome-scr .link:hover{color: blue;}
 
-#create-form{display: none;}
+.home-btns-add{
+    display: flex;
+    justify-content: space-between;
+    margin: 1rem 0;
+}
+#create-form{
+    display: none;
+    padding: 10px 0;
+}
 .mn-description, .edit-form, .done-form, .tr-container{display: none;}
 .users-list{
     display: inline-block;
     font-size: 0.8rem;
 }
+.mn-description{width: 100%;}
+.mn-description p{margin:0;}
 .users-list .users-list-text{
     border: 1px solid #ccc;
     border-radius: 5px;
@@ -249,6 +327,41 @@ footer .footer .contacts{
     .header-piсture .quote{width: 200px;top: 150px;right: 50px;font-size: 18px;}
     footer{height: 120px;}
     footer .footer .contacts{font-size: 16px;margin: 15px 40px 0 auto;}
+    
+    .prayers-main-table .thead{display: none;}
+    .prayers-main-table .t-tr{
+        flex-direction: column;
+    }
+    .prayers-main-table .t-tr .t-date{
+        order: -3;
+    }
+    .prayers-main-table .t-tr .t-name{
+        order: -2;
+    }
+    .prayers-main-table .t-tr .mn-description{
+        order: -1;
+    }
+    .prayers-main-table .t-tr .t-action{
+        display: flex;
+        justify-content: space-around;
+    }
+    .prayers-main-table .t-tr .mn-show{
+        background: url('../img/triangle-down.png') no-repeat center;
+    }
+    .prayers-main-table .t-tr .mn-act.btn-outline-info{
+        background: url('../img/edit.svg') no-repeat center;
+    }
+    .prayers-main-table .t-tr .mn-act.btn-outline-success{
+        background: url('../img/tick.svg') no-repeat center;
+    }
+    .prayers-main-table .t-tr .btn{
+        width: 30px;
+        height: 30px;
+    }
+    .prayers-main-table .t-tr .btn.active{
+        background-color: transparent;
+        }
+    .prayers-main-table .t-tr .btn span{display: none;}
 }
 @media (max-width:480px){
     body{font-size: 14px;}
