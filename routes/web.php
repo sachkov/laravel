@@ -17,7 +17,11 @@ Route::get('/', function () {
 
 Auth::routes();
 
-Route::get('/home', 'HomeController@index')->name('home');
+Route::get('/home', 'HomeController@index')->name('home');  //Мои молитвы
+
+Route::get('/prayerslist', 'HomeController@prayersList')->name('list');
+
+Route::get('/prayers_end', 'HomeController@prayersEnd')->name('prayersEnd');
 
 //Проверочный маршрут к тестовой странице
 Route::match(["get", "post"], '/test', 'TestController@start')->name('test');

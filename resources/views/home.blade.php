@@ -1,5 +1,7 @@
 @extends('layouts.mn_section')
 
+@section('title', 'Мои нужды')
+
 @section('content')
 <div id="appV">
     <form id="create-form">
@@ -35,46 +37,55 @@
         </div>
         <?/*<div class="form-group">
             <label for="input-name">Действует до</label>
-            <input type="text" class="form-control" id="input-date" placeholder="Дата окончания, если исвестно">
+            <input type="text" class="form-control" id="input-date" placeholder="Дата окончания, если известно">
         </div>*/?>
         <div id="btn-save-mn" class="btn btn-success">Сохранить</div>
         <div id="btn-cancel-mn" class="btn btn-light">Отмена</div>
     </form>
-    <div class="d-flex justify-content-end my-3">
+    <div class="home-btns-add">
+        <a class="btn btn-info" href="{{route('prayersEnd')}}">Завершенные молитвы</a>
         <button type="button" id="btn-add-mn" class="btn btn-success">Добавить</button>
     </div>
-    <table class="table table-hover prayers-main-table">
-        <thead>
-            <tr>
-                <th scope="col">Дата</th>
-                <th scope="col">Автор</th>
-                <th scope="col">Название</th>
-                <th scope="col">Действия</th>
-            </tr>
-        </thead>
-        <tbody>
+    
+    
+    <div class="prayers-main-table">
+        <div class="t-tr thead">
+            <div class="t-td t-date">Дата</div>
+            <div class="t-td t-name">Название</div>
+            <div class="t-td t-action">Действия</div>
+        </div>
+        <div class="tbody">
             @foreach($arMN as $MN)
-            <tr class="main" data-mnid="{{$MN->id}}">
-                <th title="Дата" scope="row">{{ $MN->created_at->format('d.m.Y') }}</th>
-                <td title="Автор">{{ $MN->author->name }}</td>
-                <td title="Название" class="main-name">{{ $MN->name }}</td>
-                <td title="Действия">
-                    <button type="button" class="btn btn-outline-primary btn-sm mn-show">Показать описание</button>
-                    <button type="button" class="btn btn-outline-info btn-sm mn-act" data-act="edit">Редактировать</button>
-                    <button type="button" class="btn btn-outline-success btn-sm mn-act" data-act="done">Завершить</button>
-                </td>
-            </tr>
-            <tr id="desc-{{ $MN->id }}" class="mn-description">
-                <td colspan="4">
-                    {{ $MN->description }}
-                <?// В описание надо включить описание видимости данной молитвы?>
-                </td>
-            </tr>
-            <tr id="container-{{ $MN->id }}" class="tr-container"><td colspan="4" id="container-td-{{ $MN->id }}"></td></tr>
+            <div class="mn-item">
+                <div class="t-tr" data-mnid="{{$MN->id}}">
+                    <div class="t-td t-date" title="Дата" >{{ $MN->created_at->format('d.m.Y') }}</div>
+                    <div class="t-td t-name" title="Название">{{ $MN->name }}</div>
+                    <div class="t-td t-action" title="Действия">
+                        <button type="button" class="btn btn-outline-primary btn-sm mn-show">
+                            <span>Показать описание</span>
+                        </button>
+                        <button type="button" class="btn btn-outline-info btn-sm mn-act" data-act="edit">
+                            <span>Редактировать</span>
+                        </button>
+                        <button type="button" class="btn btn-outline-success btn-sm mn-act" data-act="done">
+                            <span>Завершить</span>
+                        </button>
+                    </div>
+                    <div id="desc-{{ $MN->id }}" class="mn-description">
+                        <p>{{ $MN->description }}</p>
+                        @if($MN->answer)
+                            <p>{{$MN->answer}}</p>
+                        @endif
+                    <?// В описание можно включить описание видимости данной молитвы?>
+                    </div>
+                </div>
+                <div id="container-{{ $MN->id }}" class="tr-container"></div>
+            </div>
             @endforeach
-        </tbody>
+        </div>
         
-    </table>
+    </div>
+
 
     <div class="edit-form">
         <div class="form-group">
@@ -86,7 +97,7 @@
             <label for="descr-edit">Описание</label>
             <textarea class="form-control" id="descr-edit" rows="3" ></textarea>
         </div>
-        <div class="form-group" id="result-egit-form">
+        <div class="form-group" id="result-edit-form">
             <label for="result-edit">Результат</label>
             <textarea class="form-control" id="result-edit" rows="3"></textarea>
         </div>
@@ -139,5 +150,8 @@
 
     ?></pre>
 </div>
-<test></test>
+@endsection
+
+@section('script')
+    <script src="{{ asset('js/prayers.js') }}"></script>
 @endsection
