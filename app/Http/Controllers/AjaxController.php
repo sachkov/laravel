@@ -41,10 +41,15 @@ class AjaxController extends Controller
         {
             $r = [];
             $MN_model = new \App\Models\MN;
+            $offset = 0;
+            if($request->input('offset'))
+                $offset = $request->input('offset');
             $prayers = $MN_model::where('author_id', Auth::user()->id)
-               ->orderBy('name', 'desc')
-               ->take(20)
-               ->get();
+                ->orderBy('name', 'desc')
+                ->offset($offset)
+                ->take(5)
+                ->get();
+            $res = [];
             foreach($prayers as $k=>$pr){
                 $r = [];
                 $res[$k] = [
@@ -64,7 +69,7 @@ class AjaxController extends Controller
             }
         } 
         else {
-            $res['error'] = 'У вас нет доступа или комментарий пустой';
+            $res['error'] = 'У вас нет доступа';
         }
 
         return json_encode($res);
@@ -90,7 +95,7 @@ class AjaxController extends Controller
     
     public function editMN(Request $request)
     {
-        if(Auth::check()){
+        if(Auth::check() && $request->input('id')){
             $MN_model = \App\Models\MN::find($request->input('id'));
             $MN_model->name = $request->input('name');
             $MN_model->description = $request->input('text');
