@@ -47,7 +47,7 @@ class HomeController extends Controller
             ->join('mn_user__rs', 'mn.id', '=', 'mn_user__rs.mn_id')
             ->join('users', 'mn.author_id', '=', 'users.id')
             ->select('mn.*', 'users.name as author_name')
-            ->where('mn_user__rs.mn_id', Auth::user()->id)
+            ->where('mn_user__rs.user_id', Auth::user()->id)
             ->whereNull('end_date')
             ->orderBy('updated_at', 'desc')
             ->take(15)
