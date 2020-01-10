@@ -11,20 +11,10 @@
             <input type="text" class="form-control" id="input-name" placeholder="Заголовок 'о чем' или 'о ком'">
             <div class="invalid-feedback">Поле Наименование должно быть заполено!</div>
         </div>
-
-        <?/*<div class="form-group">
-            <label for="sel-groups">Видно группам</label>
-            <select multiple class="form-control" id="sel-groups">
-                <option>Вся церковь</option>
-                <option>Малая группа</option>
-                <option>Тестовая группа</option>
-                <option>Братья</option>
-            </select>
-        </div>*/?>
         <div class="form-group">
             <label for="input-user">Видно людям</label>
             <div class="users-list">
-                <span class="users-list-text" v-for="(item,i) in table">
+                <span class="users-list-text" v-for="(item,i) in add_users_table">
                         @{{item.label}}
                     <span class="x-del" @click="del(i)">X</span>
                 </span>
@@ -35,10 +25,6 @@
             <label for="textarea-descr">Описание</label>
             <textarea class="form-control" id="textarea-descr" rows="3"></textarea>
         </div>
-        <?/*<div class="form-group">
-            <label for="input-name">Действует до</label>
-            <input type="text" class="form-control" id="input-date" placeholder="Дата окончания, если известно">
-        </div>*/?>
         <div id="btn-save-mn" class="btn btn-success">Сохранить</div>
         <div id="btn-cancel-mn" class="btn btn-light">Отмена</div>
     </form>
@@ -55,6 +41,36 @@
             <div class="t-td t-action">Действия</div>
         </div>
         <div class="tbody">
+            
+            <div class="mn-item" v-for="(mn, indx) in mainTable" v-bind:key="indx">
+                <div class="t-tr" :data-mnid="mn.id">
+                    <div class="t-td t-date" title="Дата" >@{{mn.created_at}}</div>
+                    <div class="t-td t-name" title="Название">@{{mn.name}}</div>
+                    <div class="t-td t-action" title="Действия">
+                        <button type="button" class="btn btn-outline-primary btn-sm mn-show"
+                            @click="toggle_description(indx)">
+                            @{{mn.description_show?'Скрыть описание':'Показать описание'}}
+                        </button>
+                        <button type="button" class="btn btn-outline-info btn-sm mn-act" data-act="edit"
+                            @click="show_edit_form(indx, $event)">
+                            Редактировать
+                        </button>
+                        <button type="button" class="btn btn-outline-success btn-sm mn-act" data-act="done"
+                            @click="show_done_form(indx, $event)">
+                            Завершить
+                        </button>
+                    </div>
+                    <div class="mn-description" v-show="mn.description_show">
+                        <p>@{{mn.description}}</p>
+                        <p>@{{mn.answer}}</p>
+                        <?// В описание можно включить описание видимости данной молитвы?>
+                    </div>
+                </div>
+
+                <div v-bind:id="'container-'+indx" class="tr-container"></div>
+            </div>
+            
+            <!--
             @foreach($arMN as $MN)
             <div class="mn-item">
                 <div class="t-tr" data-mnid="{{$MN->id}}">
@@ -82,35 +98,27 @@
                 <div id="container-{{ $MN->id }}" class="tr-container"></div>
             </div>
             @endforeach
+            -->
         </div>
         
     </div>
 
 
     <div class="edit-form">
-        <div class="form-group">
+        <div class="form-group" v-show="!edit.is_thanks">
             <label for="name-edit">Наименование</label>
-            <input type="text" class="form-control" id="name-edit" >
+            <input type="text" class="form-control" id="name-edit" v-model.trim="edit.name">
             <div class="invalid-feedback">Поле Наименование должно быть заполено!</div>
         </div>
-        <div class="form-group">
+        <div class="form-group" v-show="!edit.is_thanks">
             <label for="descr-edit">Описание</label>
-            <textarea class="form-control" id="descr-edit" rows="3" ></textarea>
+            <textarea class="form-control" id="descr-edit" rows="3" v-model.trim="edit.description"></textarea>
         </div>
-        <div class="form-group" id="result-edit-form">
+        <div class="form-group" id="result-edit-form" v-show="edit.is_thanks">
             <label for="result-edit">Результат</label>
-            <textarea class="form-control" id="result-edit" rows="3"></textarea>
+            <textarea class="form-control" id="result-edit" rows="3" v-model.trim="edit.result"></textarea>
         </div>
-        <?/*<div class="form-group">
-            <label for="sel-groups">Группы</label>
-            <select multiple class="form-control" id="sel-groups">
-                <option>Вся церковь</option>
-                <option>Малая группа</option>
-                <option>Тестовая группа</option>
-                <option>Братья</option>
-            </select>
-        </div>*/?>
-        <div class="form-group">
+        <div class="form-group" v-show="!edit.is_thanks">
             <label for="share-edit">Видно людям</label>
             <div class="users-list">
                 <span class="users-list-text" v-for="(item,i) in edit_users_table">
@@ -144,6 +152,10 @@
         </div>
         <div class="btn btn-primary" onclick="saveDoneForm()">Сохранить</div>
         <div class="btn btn-light" onclick="closeDoneForm()">Отмена</div>
+    </div>
+    
+    <div>
+        <div class="btn btn-outline-warning" onclick="getMorePrayers()">Еще</div>
     </div>
 
     <pre><?//print_r($arMN);
