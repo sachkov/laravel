@@ -157,6 +157,7 @@
 }
 .users-list .x-del:hover{opacity: .6;}
 
+.table_empty{text-align: center;}
 
 /*ИЗ старой верстки*/
 @font-face {

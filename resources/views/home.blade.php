@@ -69,38 +69,9 @@
 
                 <div v-bind:id="'container-'+indx" class="tr-container"></div>
             </div>
-            
-            <!--
-            @foreach($arMN as $MN)
-            <div class="mn-item">
-                <div class="t-tr" data-mnid="{{$MN->id}}">
-                    <div class="t-td t-date" title="Дата" >{{ $MN->created_at->format('d.m.Y') }}</div>
-                    <div class="t-td t-name" title="Название">{{ $MN->name }}</div>
-                    <div class="t-td t-action" title="Действия">
-                        <button type="button" class="btn btn-outline-primary btn-sm mn-show">
-                            <span>Показать описание</span>
-                        </button>
-                        <button type="button" class="btn btn-outline-info btn-sm mn-act" data-act="edit">
-                            <span>Редактировать</span>
-                        </button>
-                        <button type="button" class="btn btn-outline-success btn-sm mn-act" data-act="done">
-                            <span>Завершить</span>
-                        </button>
-                    </div>
-                    <div id="desc-{{ $MN->id }}" class="mn-description">
-                        <p>{{ $MN->description }}</p>
-                        @if($MN->answer)
-                            <p>{{$MN->answer}}</p>
-                        @endif
-                    <?// В описание можно включить описание видимости данной молитвы?>
-                    </div>
-                </div>
-                <div id="container-{{ $MN->id }}" class="tr-container"></div>
-            </div>
-            @endforeach
-            -->
+
         </div>
-        
+        <div class="table_empty" v-if="!mainTable.length">Вы еще не добавили молитвенные нуджы в свой список.</div>
     </div>
 
 
@@ -116,7 +87,7 @@
         </div>
         <div class="form-group" id="result-edit-form" v-show="edit.is_thanks">
             <label for="result-edit">Результат</label>
-            <textarea class="form-control" id="result-edit" rows="3" v-model.trim="edit.result"></textarea>
+            <textarea class="form-control" id="result-edit" rows="3" v-model.trim="edit.answer"></textarea>
         </div>
         <div class="form-group" v-show="!edit.is_thanks">
             <label for="share-edit">Видно людям</label>
@@ -133,21 +104,12 @@
     </div>
     <div class="done-form">
         <div class="form-group">
-            <label for="name-done">Наименование</label>
-            <input type="text" class="form-control" id="name-done" placeholder="Заголовок 'о чем' или 'о ком'" readonly>
-        </div>
-
-        <div class="form-group">
-            <label for="descr-done">Описание</label>
-            <textarea class="form-control" rows="3" id="descr-done" readonly="false"></textarea>
-        </div>
-        <div class="form-group">
             <label for="result-done">Результат</label>
-            <textarea class="form-control" id="result-done" rows="3"></textarea>
+            <textarea class="form-control" id="result-done" rows="3" v-model.trim="done.answer"></textarea>
             <div class="invalid-feedback">Поле Результат должно быть заполено!</div>
         </div>
         <div class="form-check">
-            <input class="form-check-input" type="checkbox" id="thankfulness">
+            <input class="form-check-input" type="checkbox" id="thankfulness" v-model="done.is_thanks">
             <label class="form-check-label" for="thankfulness">Опубликовать как благодарность</label>
         </div>
         <div class="btn btn-primary" onclick="saveDoneForm()">Сохранить</div>
@@ -155,7 +117,7 @@
     </div>
     
     <div>
-        <div class="btn btn-outline-warning" onclick="getMorePrayers()">Еще</div>
+        <div id="more_btn" class="btn btn-outline-warning" onclick="getMorePrayers()">Еще</div>
     </div>
 
     <pre><?//print_r($arMN);

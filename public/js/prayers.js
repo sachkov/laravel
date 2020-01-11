@@ -9,7 +9,7 @@ var vm = new Vue({
         arUsers: [],
         edit_users_table: [],
         is_thanks: 0,           //Является ли нужда - благодарностью
-        
+        mainTable_not_empty: 1,    //пуста ли таблица моих нужд
     },
     methods:{
         del: function(a){
@@ -42,7 +42,7 @@ var vm = new Vue({
             }else{
                 //Если опубликована благодарность то ее можно только закрыть
                 if(vm.mainTable[indx].is_thanks){
-                    saveDoneForm(true);
+                    saveDoneForm(vm.mainTable[indx].id);
                     return true;
                 }
                 closeEditForm();//на всякий случай прячем форму редактирования
@@ -54,22 +54,16 @@ var vm = new Vue({
             }
         }
     },
-    computed: {
-        /*needs: function () {
-            return this.mainTable.map(function (obj) {
-                if(!obj.description_show)
-                    obj.description_show = false;
-                else obj.description_show = !obj.description_show;
-                obj.edit_show = false;
-                obj.done_show = false;
-                return obj;
-            })
-        }*/
-    }
+    /*watch: {
+
+    },*/
+    /*computed: {
+
+    }*/
 });
 
 var arUsers = {}; //Список всех пользователей
-var mainTable;      //Основная таблица МН
+//var mainTable;      //Основная таблица МН
 var MNeditID;       //ID элемента, который в данный момнет редактируется
 
 $( document ).ready(function(){
@@ -121,59 +115,6 @@ $( document ).ready(function(){
             $("#desc-"+$(this).parents(".t-tr").data("mnid")).show();
         }
     });
-    //Открытие формы редактирования или удаления
-    /*$(".mn-act").on("click",function(){
-        var id = $(this).parents(".t-tr").data("mnid");
-        var act = $(this).data("act");
-        var MN;
-        for(x in mainTable){
-            if(mainTable[x].id == id){
-                MN = mainTable[x];      //Текущая нужда
-                break;
-            }
-        }
-        if($(this).hasClass("active")){
-            $(this).removeClass("active");
-            $("."+act+"-form").hide();
-            $("#container-"+id).hide();  //скрываем контейнер для формы редактирования/удаления
-            MNeditID = 0;
-        }else{
-            $("#container-"+id+">div").hide();   //Убераем формы которые остались показаны если была нажата
-            $(this).siblings(".mn-act.active").removeClass("active"); //кнопка редактировать сразу после завершить
-            $(this).addClass("active");
-            $("."+act+"-form")
-                .show()
-                .appendTo($("#container-"+id));
-            
-            MNeditID = id;
-            if(act == "done" && MN.is_thanks == 1){
-                saveDoneForm(true);
-                return true;
-            }
-            //Вставка значений
-            $("#name-"+act).val($(this).parents(".t-tr").find(".t-name").html());
-            $("#descr-"+act).val($(this).parents(".mn-item").find(".mn-description>p").html());
-            
-            vm.edit_users_table = MN.users;
-            
-            if(MN.is_thanks == 1){
-                $("#name-edit").prop("readonly", true);
-                $("#descr-edit").prop("readonly", true);
-                $("#result-edit-form").show();
-                $("#result-edit").val(MN.answer);
-                $("#share-edit").hide();
-            }else{
-                $("#name-edit").prop("readonly", false);
-                $("#descr-edit").prop("readonly", false);
-                $("#result-edit-form").hide();
-                $("#result-edit").val("");
-                $("#share-edit").show();
-            }
-            $("#result-done").removeClass("is-invalid");
-            $("#container-"+id).show();
-        }
-    });*/
-    
 });
 
 function getTable(offset = 0){
@@ -188,9 +129,19 @@ function getTable(offset = 0){
             offset: offset
         },
         success: function(data){
-            mainTable = data;
-            for(x in data)
-                vm.mainTable.push(data[x]);
+            if(!data.table && !data.count){
+                console.log("getting error");
+                return false;
+            }
+            //mainTable = data.table;
+            for(x in data.table)
+                vm.mainTable.push(data.table[x]);
+                
+            if(data.count && vm.mainTable.length < data.count){
+                $("#more_btn").show();
+            }else{
+                $("#more_btn").hide();
+            }
         },
         error: function(data) {
             console.log("error");
@@ -271,6 +222,7 @@ function saveMN(){
         success: function(data){
             $("#create-form").hide();
             $("#btn-add-mn").parent().show();
+            getTable();
             console.log(data);
             console.log(data.success);
         },
@@ -303,17 +255,20 @@ function closeDoneForm(){
  * и опубликовать как благодарность
  * param done - завершить молитву без указания результата и переопубликования.
  */
-function saveDoneForm(done = false){
+function saveDoneForm(id = 0){
     var result;
     var re_publish;
-    if(done){
+    var mn_id;
+    if(id){
+        mn_id = id;
         result = "";
         re_publish = 0;
     }else{
+        mn_id = vm.done.id;
         result = vm.done.answer;
-        re_publish = vm.done.is_thanks;
+        re_publish = vm.done.is_thanks?1:0;
     }
-    if(re_publish == 1 && result == ""){
+    if(re_publish == 1 && !result){
         $("#result-done").addClass("is-invalid");
         $("#result-done").one("change", function(){
             $("#result-done").removeClass("is-invalid");
@@ -330,14 +285,14 @@ function saveDoneForm(done = false){
         data: {
             _token: $('#x_token').val(),
             //id: MNeditID,
-            id: vm.done.id,
+            id: mn_id,
             result: result,
             re_publish: re_publish
         },
         success: function(data){
             //Изменение значений в таблице и закрытие формы редактирования
             closeDoneForm();
-            if(!re_publish) $(".t-tr[data-mnid="+id+"]").hide();
+            if(!re_publish) $(".t-tr[data-mnid="+mn_id+"]").hide();
         },
         error: function(data) {
             console.log("doneMN error");
@@ -377,7 +332,7 @@ function editMN(){
             name: name,
             //text: description,
             text: vm.edit.description,
-            result: vm.edit.result,
+            result: vm.edit.answer,
             users: JSON.stringify(res)
         },
         success: function(data){

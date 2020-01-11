@@ -45,28 +45,33 @@ class AjaxController extends Controller
             if($request->input('offset'))
                 $offset = $request->input('offset');
             $prayers = $MN_model::where('author_id', Auth::user()->id)
+                ->whereNull('end_date')
                 ->orderBy('name', 'desc')
                 ->offset($offset)
-                ->take(5)
+                ->take(10)
                 ->get();
-            $res = [];
+            $table = [];
             foreach($prayers as $k=>$pr){
                 $r = [];
-                $res[$k] = [
+                $table[$k] = [
                     "id"=>$pr->id,
                     "name"=>$pr->name,
                     "created_at"=>$pr->created_at->format('d.m.Y'),
                     "description"=>$pr->description,
                     "answer"=>$pr->answer,
                     "is_thanks"=>$pr->answer_date?1:0,
-                    //"IDs"=>$pr->signed_user_IDs
                 ];
                 foreach($pr->signed_users as $user){
                     $r[] = ["name"=>$user->name, "id"=>$user->id];
                 }
-                $res[$k]["author"] = ["name"=>$pr->author->name, "email"=>$pr->author->email];
-                $res[$k]["users"] = $r;
+                $table[$k]["author"] = ["name"=>$pr->author->name, "email"=>$pr->author->email];
+                $table[$k]["users"] = $r;
             }
+            $count = $MN_model::where('author_id', Auth::user()->id)
+                ->whereNull('end_date')
+                ->count();
+            
+            $res = ["table"=>$table, "count"=>$count];
         } 
         else {
             $res['error'] = 'У вас нет доступа';
@@ -99,6 +104,7 @@ class AjaxController extends Controller
             $MN_model = \App\Models\MN::find($request->input('id'));
             $MN_model->name = $request->input('name');
             $MN_model->description = $request->input('text');
+            $MN_model->answer = $request->input('result');
             $MN_model->save();
             $MN_model->signed_users()->sync(json_decode($request->input('users')));
             
