@@ -46,7 +46,7 @@ class AjaxController extends Controller
                 $offset = $request->input('offset');
             $prayers = $MN_model::where('author_id', Auth::user()->id)
                 ->whereNull('end_date')
-                ->orderBy('name', 'desc')
+                ->orderBy('updated_at', 'desc')
                 ->offset($offset)
                 ->take(10)
                 ->get();

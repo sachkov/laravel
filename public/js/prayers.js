@@ -9,7 +9,7 @@ var vm = new Vue({
         arUsers: [],
         edit_users_table: [],
         is_thanks: 0,           //Является ли нужда - благодарностью
-        mainTable_not_empty: 1,    //пуста ли таблица моих нужд
+
     },
     methods:{
         del: function(a){
@@ -64,7 +64,7 @@ var vm = new Vue({
 
 var arUsers = {}; //Список всех пользователей
 //var mainTable;      //Основная таблица МН
-var MNeditID;       //ID элемента, который в данный момнет редактируется
+//var MNeditID;       //ID элемента, который в данный момнет редактируется
 
 $( document ).ready(function(){
     
@@ -134,8 +134,10 @@ function getTable(offset = 0){
                 return false;
             }
             //mainTable = data.table;
-            for(x in data.table)
-                vm.mainTable.push(data.table[x]);
+            if(offset)
+                for(x in data.table)
+                    vm.mainTable.push(data.table[x]);
+            else vm.mainTable = data.table;
                 
             if(data.count && vm.mainTable.length < data.count){
                 $("#more_btn").show();
@@ -223,8 +225,6 @@ function saveMN(){
             $("#create-form").hide();
             $("#btn-add-mn").parent().show();
             getTable();
-            console.log(data);
-            console.log(data.success);
         },
         error: function() {
             console.log("error");
