@@ -25,14 +25,11 @@ class HomeController extends Controller
      */
     public function index()
     {
-        /*$MN_model = new \App\Models\MN;
-
-        $arMN = $MN_model::whereNull('end_date')
-            ->orderBy('updated_at', 'desc')
-            ->take(15)
-            ->get();*/
+        $ar =DB::raw('SHOW TABLES')->get();
         
-        return view('home');
+        //запрос "DESCRIBE `имя таблицы`" выводит описание полей таблицы
+        
+        return view('admin', ["tables"=>$ar]);
         
     }
     

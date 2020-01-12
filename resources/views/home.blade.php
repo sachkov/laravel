@@ -76,6 +76,7 @@
 
 
     <div class="edit-form">
+        <h5 class="mobile-header-form">Форма редактирования</h5>
         <div class="form-group" v-show="!edit.is_thanks">
             <label for="name-edit">Наименование</label>
             <input type="text" class="form-control" id="name-edit" v-model.trim="edit.name">
@@ -102,7 +103,9 @@
         <div class="btn btn-primary" id="btn-save-edit">Сохранить</div>
         <div id="btn-cancel-edit" class="btn btn-light">Отмена</div>
     </div>
+    
     <div class="done-form">
+        <h4 class="mobile-header-form">Форма завершения</h4>
         <div class="form-group">
             <label for="result-done">Результат</label>
             <textarea class="form-control" id="result-done" rows="3" v-model.trim="done.answer"></textarea>
@@ -124,6 +127,12 @@
 
     ?></pre>
 </div>
+<script>
+    let auth = true;
+    <?if(Auth::guest()){?>
+       auth = false; 
+    <?}?>
+</script>
 @endsection
 
 @section('script')
