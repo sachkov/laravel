@@ -67,14 +67,9 @@ var arUsers = {}; //Список всех пользователей
 
 $( document ).ready(function(){
     
-    if(location.pathname && location.pathname.indexOf('/home')+1){
-        if(auth){
-
-            getTable();//Получение основной таблицы молитвенных нужд
-            
-            getUsers();//Получение списка пользователей для "поделится"
-        }
-    }
+    getTable();
+    //Получение списка пользователей для "поделится"
+    getUsers();
 
     //Нажатие на "Добавить"
     $("#btn-add-mn").on("click",function(){
