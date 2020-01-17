@@ -405,7 +405,7 @@ footer .footer .contacts{
         position: absolute;
         top: -200px;
         right: 0;
-        transition: top 1s ease-in;
+        transition: top 500ms ease-in;
         display: flex;
         background-color: DarkKhaki;
     }

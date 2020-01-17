@@ -66,7 +66,12 @@
         <div class="main-section bg-yellow-lightest flex-1">
             <div class="container mx-auto">
            <?/*CONTENT*/?>
-           
+           <input type="hidden" id="x_token" value="{{ csrf_token() }}">
+           <pre><?//print_r($tables);?></pre>
+           @foreach($tables as $name=>$number)
+           <div class="point" onclick="show_table('{{$name}}')">{{$name}} ({{$number}})</div>
+           @endforeach
+           <div id="main_table"></div>
            <?/*CONTENT*/?>
             </div>
         </div>
@@ -79,6 +84,7 @@
     <script src="{{ asset('js/app.js') }}"></script>
     <!-- Custom scripts -->
     <script src="{{ asset('js/admin.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@8"></script>
      <!-- JQuery UI scripts -->
     <script src="{{ asset('js/jquery-ui.min.js') }}"></script>
 </body>

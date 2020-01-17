@@ -62,6 +62,7 @@ class HomeController extends Controller
     {
         $MN_model = new \App\Models\MN;
         $arMN = $MN_model::whereNotNull('end_date')
+            ->where('author_id', Auth::user()->id)
             ->orderBy('updated_at', 'desc')
             ->take(15)
             ->get();

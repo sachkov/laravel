@@ -147,4 +147,40 @@ class AjaxController extends Controller
         }
         return response()->json( $out );
     }
+    
+    public function getUsersForSelect2(Request $request)
+    {
+        if(Auth::check())
+        {
+            $User_model = new \App\User;
+            $objUsers = $User_model::all();
+            
+            foreach($objUsers as $user){
+                $res[$user->id] = $user->name;
+            }
+        } 
+        else {
+            $res['error'] = 'У вас нет доступа или комментарий пустой';
+        }
+
+        return json_encode($res);
+        /*
+         * {
+              "results": [
+                {
+                  "id": 1,
+                  "text": "Option 1"
+                },
+                {
+                  "id": 2,
+                  "text": "Option 2"
+                }
+              ],
+              "pagination": {
+                "more": true
+              }
+            }
+         * /
+    }
+    
 }

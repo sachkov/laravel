@@ -1,3 +1,16 @@
+/*ADMIN START*/
+.point{cursor: pointer;}
+
+#main_table table.table{
+    width: 100%;
+    font-size: 12px;
+}
+#main_table table.table td.point.rd span{
+    border: 2px solid red;
+    border-radius: 11px;
+    padding: 1px 4px;
+}
+/*ADMIN END*/
 .main-section{
     min-height: calc(100vh - 270px);
 }

@@ -38,4 +38,6 @@ Route::post('/ajax/getTable', 'AjaxController@getTable');
 Route::post('/ajax/getUsers', 'AjaxController@getUsers');
 
 //Маршруты к административным страницам
-//Route::get('/admin', 'AdminController@index');
+Route::get('/admin', 'AdminController@index');
+
+Route::post('/admin/getTable', 'AdminController@getTable');

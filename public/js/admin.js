@@ -1,215 +1,18 @@
-var vm = new Vue({
-    el: '#appV',
-    data: {
-        mainTable: [],
-        add_users_table: [],
-        edit: {},           //Объект - редактируемая в данный момент нужда
-        done: {},           //Завершаемая в данный момент нужда
-        text: '',
-        arUsers: [],
-        edit_users_table: [],
-        is_thanks: 0,           //Является ли нужда - благодарностью
-    },
-    methods:{
-        del: function(a){
-            vm.add_users_table.splice(a,1);
-        },
-        edit_del: function(a){
-            vm.edit_users_table.splice(a,1);
-        },
-        toggle_description(indx){
-            var temp = vm.mainTable[indx];
-            temp.description_show = !temp.description_show;
-            vm.$set(vm.mainTable, indx, temp);
-        },
-        show_edit_form(indx, event){
-            if($(event.target).hasClass("active")){
-                closeEditForm();
-            }else{
-                closeDoneForm();//на всякий случай прячем форму завершения
-                
-                $(event.target).addClass("active");
-                $("#container-"+indx).append($(".edit-form"));
-                $(".edit-form").show();
-                vm.edit = vm.mainTable[indx];
-                vm.edit_users_table = vm.mainTable[indx].users;
-            }
-        },
-        show_done_form(indx, event){
-            if($(event.target).hasClass("active")){
-                closeDoneForm();
-            }else{
-                //Если опубликована благодарность то ее можно только закрыть
-                if(vm.mainTable[indx].is_thanks){
-                    saveDoneForm(vm.mainTable[indx].id);
-                    return true;
-                }
-                closeEditForm();//на всякий случай прячем форму редактирования
-                
-                $(event.target).addClass("active");
-                $("#container-"+indx).append($(".done-form"));
-                $(".done-form").show();
-                vm.done = vm.mainTable[indx];
-            }
-        }
-    },
-    /*watch: {
-
-    },*/
-    /*computed: {
-
-    }*/
-});
-
-var arUsers = {}; //Список всех пользователей
-//var mainTable;      //Основная таблица МН
-//var MNeditID;       //ID элемента, который в данный момнет редактируется
-
+let tableLength = 0;        //Длинна текущей таблицы
+let tableName = '';
 $( document ).ready(function(){
     
-    getTable();
-    //Получение списка пользователей для "поделится"
-    getUsers();
-
-    //Нажатие на "Добавить"
-    $("#btn-add-mn").on("click",function(){
-        $(this).parent().hide();
-        $("#create-form").show();
-    });
-    //Нажатие на "Сохранить" (Добавление МН)
-    $("#btn-save-mn").on("click",function(event){
-        //отправка ajax
-        saveMN();
-    });
-    //Нажатие на Отменить (Добавление МН)
-    $("#btn-cancel-mn").on("click",function(event){
-        $("#create-form").hide();
-        $("#btn-add-mn").parent().show();
-        $("#input-name").val("");
-        $("#textarea-descr").val("");
-        $("#input-user").val("");
-        vm.add_users_table = [];
-    });
-    
-    //Нажатие на "Сохранить" (Редактирование МН)
-    $("#btn-save-edit").on("click",function(event){
-        //отправка ajax
-        editMN();
-    });
-    
-    //Нажатие на "Отменить" (Редактирование МН)
-    $("#btn-cancel-edit").on("click",function(event){
-        closeEditForm();
-    });
-    
-    //Нажатие на "Показать описание"
-    $(".mn-show").on("click",function(){
-        if($(this).hasClass("active")){
-            $(this).removeClass("active");
-            $(this).find("span").html("Показать описание");
-            $("#desc-"+$(this).parents(".t-tr").data("mnid")).hide();
-        }else{
-            $(this).addClass("active");
-            $(this).find("span").html("Скрыть описание");
-            $("#desc-"+$(this).parents(".t-tr").data("mnid")).show();
-        }
-    });
 });
-
-function getTable(offset = 0){
-    $.ajax({
-        type: "POST",
-        url: "/ajax/getTable",
-        dataType: "json",
-        headers: {
-                'X-CSRF-TOKEN': $('#x_token').val()
-            },
-        data: {
-            offset: offset
-        },
-        success: function(data){
-            if(!data.table && !data.count){
-                console.log("getting error");
-                return false;
-            }
-            //mainTable = data.table;
-            if(offset){
-                for(x in data.table)
-                    vm.mainTable.push(data.table[x]);
-            }else vm.mainTable = data.table;
-                
-            if(data.count && vm.mainTable.length < data.count){
-                $("#more_btn").show();
-            }else{
-                $("#more_btn").hide();
-            }
-        },
-        error: function(data) {
-            console.log("error");
-            console.log(data);
-        }
-    });
-}
-
-function getUsers(){
-    $.ajax({
-        type: "POST",
-        url: "/ajax/getUsers",
-        dataType: "json",
-        headers: {
-                'X-CSRF-TOKEN': $('#x_token').val()
-            },
-        success: function(data){
-            var arUsers = [];
-            for(x in data){
-                arUsers.push({label: data[x], value:x});
-            }
-            $("#input-user").autocomplete({
-                minLength: 1,
-                source: arUsers,
-                select: function( event, ui ) {
-                    vm.add_users_table.push(ui.item);
-                },
-                close: function( event, ui ){
-                    $("#input-user").val("");
-                }
-            });
-            $("#share-edit").autocomplete({
-                minLength: 1,
-                source: arUsers,
-                select: function( event, ui ) {
-                    vm.edit_users_table.push({name: ui.item.label, id: parseInt(ui.item.value,10)});
-                },
-                close: function( event, ui ){
-                    $("#share-edit").val("");
-                }
-            });
-        },
-        error: function(data) {
-            console.log("error");
-            console.log(data);
-        }
-    });
-}
-
-function saveMN(){
-    // Находим массив ID пользователи, с которыми поделились молитвой
-    var name = $("#input-name").val();
-    if(!name || name.length < 3){
-        $("#input-name").addClass("is-invalid");
-        $("#input-name").one("change", function(){
-            $("#input-name").removeClass("is-invalid");
-        });
-        return false;
-    }
-    var res = [];
-    for(i in vm.add_users_table){
-        res.push(vm.add_users_table[i].value);
-    }
+/*
+ * Запрос на получение содержимого выбранной таблицы
+ */
+function show_table(name){
+    console.log(name);
+    tableName = '';
     //отправка ajax
     $.ajax({
         type: "POST",
-        url: "/ajax/saveMN",
+        url: "/admin/getTable",
         dataType: "json",
         headers: {
             'X-CSRF-TOKEN': $('#x_token').val()
@@ -217,139 +20,95 @@ function saveMN(){
         data: {
             _token: $('#x_token').val(),
             name: name,
-            text: $("#textarea-descr").val(),
-            users: JSON.stringify(res)
         },
         success: function(data){
-            $("#create-form").hide();
-            $("#btn-add-mn").parent().show();
-            getTable();
+            try{
+            console.log(data);
+            tableLength = data.count;
+            tableName = name;
+            
+            //do table
+            $("#main_table").html(createTable(data.table));
+            }catch{
+                console.log("show_table data error!");
+            }
         },
-        error: function() {
-            console.log("error");
+        error: function(data) {
+            console.log("show_table error");
+            console.log(data);
         }
     });
 }
-//Закрытие формы редактирования
-function closeEditForm(){
-    $("#name-edit").val("");
-    $("#descr-edit").val("");
-    $("#result-edit").val("");
-    vm.edit_users_table = [];
-    $(".mn-act.active").removeClass("active");
-    $(".edit-form").hide();
-    //$("#container-"+MNeditID).hide();
-    //MNeditID = 0;
+/*
+ * Функция создания html таблицы на основе входного массива
+ */
+function createTable(data){
+    let html = '<table class="table">';
+    for(x in data){
+        html += '<tr>';
+        if(x == 0){
+            for(y in data[0]){
+                html += '<th>'+y+'</th>';
+            }
+            html += '<th>Delete</th></tr><tr>';
+        }
+        for(z in data[x]){
+            html += '<td>'+data[x][z]+'</td>';
+        }
+        html += '<td class="point rd" onclick="del('+data[x].id+')"><span>X</span></td></tr>';
+    }
+    html += '</table>';
+    return html;
 }
-//Закрытие формы завершения
-function closeDoneForm(){
-    vm.edit_users_table = [];
-    $(".mn-act.active").removeClass("active");
-    $(".done-form").hide();
-    //$("#container-"+MNeditID).hide();
-    //MNeditID = 0;
+
+/*
+ * Попап с подтверждением удаления
+ */
+function del(id){
+    Swal.fire({
+        title: 'Точно удалить запись',
+        text: "Отменить не получится!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'ДА, удалить',
+        cancelButtonText: 'Отмена'
+    }).then((result) => {
+        if (result.value) {
+            trueDel(id);
+        }
+    })
 }
 /*
- * Завершение публикации молитвы с возможностью добавить результат
- * и опубликовать как благодарность
- * param done - завершить молитву без указания результата и переопубликования.
+ * Запрос на удаление записи из БД
  */
-function saveDoneForm(id = 0){
-    var result;
-    var re_publish;
-    var mn_id;
-    if(id){
-        mn_id = id;
-        result = "";
-        re_publish = 0;
-    }else{
-        mn_id = vm.done.id;
-        result = vm.done.answer;
-        re_publish = vm.done.is_thanks?1:0;
-    }
-    if(re_publish == 1 && !result){
-        $("#result-done").addClass("is-invalid");
-        $("#result-done").one("change", function(){
-            $("#result-done").removeClass("is-invalid");
-        });
+function trueDel(id=0){
+    console.log(id);
+    if(!tableName || tableName=='' || !id){
+        console.log('trueDel input data error');
         return false;
     }
     $.ajax({
         type: "POST",
-        url: "/ajax/doneMN",
+        url: "/admin/delTableRow",
         dataType: "json",
         headers: {
             'X-CSRF-TOKEN': $('#x_token').val()
         },
         data: {
             _token: $('#x_token').val(),
-            //id: MNeditID,
-            id: mn_id,
-            result: result,
-            re_publish: re_publish
+            name: tableName,
+            id: id
         },
         success: function(data){
-            //Изменение значений в таблице и закрытие формы редактирования
-            closeDoneForm();
-            if(!re_publish) $(".t-tr[data-mnid="+mn_id+"]").hide();
+            if(data) console.log("del success");
+            else console.log("del error");
         },
         error: function(data) {
-            console.log("doneMN error");
+            console.log("delTableRow error");
             console.log(data);
         }
     });
 }
 
-function editMN(){
-    // Находим массив ID пользователи, с которыми поделились молитвой
-    var res = [];
-    //var name = $("#name-edit").val();
-    var name = vm.edit.name;
-    if(!name || name.length < 3){
-        $("#name-edit").addClass("is-invalid");
-        $("#name-edit").one("change", function(){
-            $("#name-edit").removeClass("is-invalid");
-        });
-        return false;
-    }
-    //var description = $("#descr-edit").val();
-    for(i in vm.edit_users_table){
-        res.push(vm.edit_users_table[i].id);
-    }
-    //отправка ajax
-    $.ajax({
-        type: "POST",
-        url: "/ajax/editMN",
-        dataType: "json",
-        headers: {
-            'X-CSRF-TOKEN': $('#x_token').val()
-        },
-        data: {
-            _token: $('#x_token').val(),
-            //id: MNeditID,
-            id: vm.edit.id,
-            name: name,
-            //text: description,
-            text: vm.edit.description,
-            result: vm.edit.answer,
-            users: JSON.stringify(res)
-        },
-        success: function(data){
-            //Изменение значений в таблице и закрытие формы редактирования
-            /*$(".t-tr[data-mnid='"+MNeditID+"'] .t-name").html(name);
-            $("#desc-"+MNeditID+" td").html(description);*/
-            closeEditForm();
-        },
-        error: function() {
-            console.log("editMN error");
-        }
-    });
-}
-
-/*
- * Загрузка дополнительных нужд
- */
-function getMorePrayers(){
-    var offset = vm.mainTable.length;
-    getTable(offset);
-}
