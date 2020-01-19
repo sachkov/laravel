@@ -12,6 +12,7 @@
     <link href="{{ asset('css/bootstrap.css') }}" rel="stylesheet">
     <!-- Custom CSS -->
     <link href="{{ asset('css/prayers.css') }}" rel="stylesheet">
+    @yield('css')
     <!-- Jquery UI CSS -->
     <link href="{{ asset('css/jquery-ui.min.css') }}" rel="stylesheet">
     <title>@yield('title')</title>
@@ -31,7 +32,7 @@
             <div class="container mx-auto">
                 <div class="header-first-line">
                     <div class="header-logo">
-                        <img class="" src="img/cross.png" alt="logo-cross"/>
+                        <img class="" src="/img/cross.png" alt="logo-cross"/>
                         <div class="church-name">
                             <span class="name">пробуждение</span>
                             <span class="description">церковь евангельских христиан</span>
@@ -39,7 +40,7 @@
                         
                     </div>
                     <label for="menu-checkbox">
-                        <img class="mobile-menu" src="img/icons8-menu-filled.svg" alt="menu">
+                        <img class="mobile-menu" src="/img/icons8-menu-filled.svg" alt="menu">
                     </label>
                     <input id="menu-checkbox" type="checkbox" style="display: none;"/>
                     <div class="enter_link">
@@ -50,6 +51,7 @@
                             <span class="list">{{ Auth::user()->name }}</span>
                             <a class="list" href="{{route('home')}}">Мои нужды</a>
                             <a class="list" href="{{route('list')}}">Молитвы</a>
+                            <a class="list" href="{{route('personal')}}">Личный кабинет</a>
                             <a class="list" href="{{ route('logout') }}"
                                 onclick="event.preventDefault();
                                 document.getElementById('logout-form').submit();">

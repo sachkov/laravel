@@ -35,7 +35,7 @@
         </div>
         <script>
             let quotesCont = document.querySelector(".quotes-cont");
-            let interval = 1000;
+            let interval = 2000;
             let timerId = setTimeout(function tick() {
                 let quote = document.querySelector(".quote:first-child");
                 quotesCont.appendChild(quote);

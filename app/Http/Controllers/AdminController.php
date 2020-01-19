@@ -27,8 +27,24 @@ class AdminController extends Controller
     public function index()
     {
         $tables = $this->getTableNames();
+        /*$code = 1;
+        $WelcomeCodes = new \App\Models\WelcomeCodes;
+        $code = $WelcomeCodes::select('id')
+                ->where([
+                    ["code", "=", '222'], 
+                    ["created_at", ">", date("Y-m-d", (time() - 5*24*60*60))]
+                ])
+                ->whereNull('user_id')
+                ->count();
+
+        /*$WelcomeCodes->code = 222;
+        $WelcomeCodes->author_id = Auth::user()->id;
+        $WelcomeCodes->save();*/
+        $BadEmailsReg = new \App\Models\BadEmailsReg;
+        $code = $bad_email = $BadEmailsReg::where("email", 'aa@aa.ru')->get();
         
-        return view('admin', ["tables"=>$tables]);
+        return view('admin', ["tables"=>$tables, "code"=>$code]);
+        //return view('admin', ["tables"=>$tables]);
         
     }
     public function getTable(Request $request)
@@ -50,13 +66,15 @@ class AdminController extends Controller
     public function deleteRowInTable(Request $request)
     {
         $name = $request->input('name');
+        $ar = $this->getTableNames();
+        $tables = array_keys($ar);
         if(!$name || !in_array($name, $tables)) return response('bad input name', 400);
         
         $offset = $request->input('offset')?$request->input('offset'):0;
         $table = DB::table($name)
-            ->where("id", intval($request->input('offset')))
+            ->where("id", intval($request->input('id')))
             ->delete();
-        return true;
+        return 'delete is success';
     }
     
     private function getTableNames(){
@@ -68,30 +86,5 @@ class AdminController extends Controller
         }
         return $ar2;
     }
-    /*
-    public function prayersList()
-    {
-        $MN = DB::table("mn")
-            ->join('mn_user__rs', 'mn.id', '=', 'mn_user__rs.mn_id')
-            ->join('users', 'mn.author_id', '=', 'users.id')
-            ->select('mn.*', 'users.name as author_name')
-            ->where('mn_user__rs.user_id', Auth::user()->id)
-            ->whereNull('end_date')
-            ->orderBy('updated_at', 'desc')
-            ->take(30)
-            ->get();
-            
-        return view('prayersList', ["arMN"=>$MN]);
-    }
-    public function prayersEnd()
-    {
-        $MN_model = new \App\Models\MN;
-        $arMN = $MN_model::whereNotNull('end_date')
-            ->orderBy('updated_at', 'desc')
-            ->take(15)
-            ->get();
-        
-        return view('prayersEnd', ["arMN"=>$arMN]);
-    }
-*/
+
 }

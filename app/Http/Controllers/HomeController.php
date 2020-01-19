@@ -42,7 +42,9 @@ class HomeController extends Controller
      */
     public function prayersList()
     {
-        $MN = DB::table("mn")
+        $MN_model = new \App\Models\MN;
+
+        $MN = $MN_model
             ->join('mn_user__rs', 'mn.id', '=', 'mn_user__rs.mn_id')
             ->join('users', 'mn.author_id', '=', 'users.id')
             ->select('mn.*', 'users.name as author_name')
@@ -55,25 +57,4 @@ class HomeController extends Controller
         return view('prayersList', ["arMN"=>$MN]);
     }
     
-    /*
-     * Список моих завершенных молитв
-     */
-    public function prayersEnd()
-    {
-        $MN_model = new \App\Models\MN;
-        $arMN = $MN_model::whereNotNull('end_date')
-            ->where('author_id', Auth::user()->id)
-            ->orderBy('updated_at', 'desc')
-            ->take(15)
-            ->get();
-        
-        return view('prayersEnd', ["arMN"=>$arMN]);
-    }
-    /**
-     * Тестовая страница для отработки методов
-     */
-    public function testpage()
-    {
-        return view('test');
-    }
 }

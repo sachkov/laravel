@@ -164,23 +164,7 @@ class AjaxController extends Controller
         }
 
         return json_encode($res);
-        /*
-         * {
-              "results": [
-                {
-                  "id": 1,
-                  "text": "Option 1"
-                },
-                {
-                  "id": 2,
-                  "text": "Option 2"
-                }
-              ],
-              "pagination": {
-                "more": true
-              }
-            }
-         * /
+
     }
     
 }

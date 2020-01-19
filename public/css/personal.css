@@ -1,0 +1,13 @@
+.personal{
+    display: flex;
+    padding: 10px;
+    flex-wrap: wrap;
+}
+.personal .info{padding: 5px 10px 0 10px}
+.p_content{margin: 0 0 0 10px;}
+
+.p_content .table{margin-top: 10px;}
+
+#new_invite{display: none;}
+
+#invite_code{font-weight: bold;}

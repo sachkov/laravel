@@ -38,10 +38,10 @@
     border-radius: 10px;
     padding: 5px;
     margin-bottom: 5px;
-}
-.prayers-list .prayes{
-    display: flex;
     padding: 10px;
+}
+.prayers-list .prayes .timeText{
+    display: flex;
 }
 .prayers-list .time-column{
     max-width: 90px;
@@ -59,7 +59,7 @@
     padding-top: 3px;
     margin: 0;
 }
-.prayers-list .text-column p{
+.prayers-list .description{
     margin-bottom: 5px;
 }
 .prayers-list .header{
@@ -387,6 +387,9 @@ footer .footer .contacts{
         font-size: 36px;
     }
 }
+@media (max-width:600px){
+    .header-first-line .enter_link .list{font-size: 16px;}
+}
 @media (max-width:480px){
     body{font-size: 14px;}
     .main-section{min-height: calc(100vh - 200px);}
@@ -410,14 +413,9 @@ footer .footer .contacts{
         background-color: DarkKhaki;
     }
     #menu-checkbox:checked + .enter_link{top: 70px;}
-    /*#menu-checkbox + .enter_link{
-        display: none;
-    }*/
-    .header-first-line .enter_link .list{
-        
-    }
+
     .header-first-line .mobile-menu{display: block; margin-right: 10px;}
-    /*.header-piсture{height: 100px;}*/
+
     .header-piсture .quote{width: 200px;top: 90px;right: 50px;font-size: 14px;}
     .News h3, .Calendar h3, .Location h3, .feedback-form h3, .aboutCherch h3{font-size: 20px; }
     #map{width: 100%;}
