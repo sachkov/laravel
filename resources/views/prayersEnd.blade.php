@@ -3,23 +3,26 @@
 @section('title', 'Завершенные молитвы')
 
 @section('content')
+<h3>Завершенные молитвы</h3>
 <div class="prayers-list">
     @foreach ($arMN as $MN)
     <div class="prayes">
-        <div class="time-column">
-            <p class="time from">{{ $MN->created_at }}</p>
-            <p class="time at">{{ $MN->end_date }}</p>
+        <div class="timeText">
+            <div class="time-column">
+                <p class="time from">{{ $MN->created_at->format('d.m.Y') }}</p>
+                <p class="time at">{{ date('d.m.Y',strtotime($MN->end_date)) }}</p>
+            </div>
+            <div class="text-column">
+                <p class="header"><span>{{$MN->name}}</span></p>
+            </div>
         </div>
-        <div class="text-column">
-            <p class="header"><span>{{$MN->name}}</span></p>
-            <p class="description">{{$MN->description}}</p>
-            @if ($MN->answer)
-                <p class="answer">
-                    <span class="answer-date">{{$MN->answer_date}}</span>
-                    {{$MN->answer}}
-                </p>
-            @endif
-        </div>
+        <p class="description">{{$MN->description}}</p>
+        @if ($MN->answer)
+            <p class="answer">
+                <span class="answer-date">{{ date('d.m.Y',strtotime($MN->answer_date)) }}</span>
+                Результат: {{$MN->answer}}
+            </p>
+        @endif
         @if ($loop->first)
             <div class="act">
                 {{--кнопка "вернуть", еще не придумал как работает--}}

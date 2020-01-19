@@ -29,7 +29,7 @@
         <div id="btn-cancel-mn" class="btn btn-light">Отмена</div>
     </form>
     <div class="home-btns-add">
-        <a class="btn btn-info" href="{{route('prayersEnd')}}">Завершенные молитвы</a>
+        <a class="btn btn-info" href="{{route('list')}}">Молитвы</a>
         <button type="button" id="btn-add-mn" class="btn btn-success">Добавить</button>
     </div>
     

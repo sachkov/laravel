@@ -15,14 +15,6 @@
     <!-- Jquery UI CSS -->
     <link href="{{ asset('css/jquery-ui.min.css') }}" rel="stylesheet">
     <title>Admin panel</title>
-    <!-- Favicons -->
-    <link rel="apple-touch-icon" sizes="76x76" href="/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-    <link rel="manifest" href="/site.webmanifest">
-    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
-    <meta name="msapplication-TileColor" content="#ffc40d">
-    <meta name="theme-color" content="#ffffff">
     
 </head>
 <body class="h-full">
@@ -66,7 +58,12 @@
         <div class="main-section bg-yellow-lightest flex-1">
             <div class="container mx-auto">
            <?/*CONTENT*/?>
-           
+           <input type="hidden" id="x_token" value="{{ csrf_token() }}">
+           <pre><?//print_r($code);?></pre>
+           @foreach($tables as $name=>$number)
+           <div class="point" onclick="show_table('{{$name}}')">{{$name}} ({{$number}})</div>
+           @endforeach
+           <div id="main_table"></div>
            <?/*CONTENT*/?>
             </div>
         </div>
@@ -79,6 +76,7 @@
     <script src="{{ asset('js/app.js') }}"></script>
     <!-- Custom scripts -->
     <script src="{{ asset('js/admin.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@8"></script>
      <!-- JQuery UI scripts -->
     <script src="{{ asset('js/jquery-ui.min.js') }}"></script>
 </body>

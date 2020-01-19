@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Auth;
 
-class HomeController extends Controller
+class AdminController extends Controller
 {
     /**
      * Create a new controller instance.
@@ -16,6 +16,7 @@ class HomeController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
+        $this->middleware('admin');
     }
 
     /**
@@ -25,51 +26,65 @@ class HomeController extends Controller
      */
     public function index()
     {
-        $ar =DB::raw('SHOW TABLES')->get();
+        $tables = $this->getTableNames();
+        /*$code = 1;
+        $WelcomeCodes = new \App\Models\WelcomeCodes;
+        $code = $WelcomeCodes::select('id')
+                ->where([
+                    ["code", "=", '222'], 
+                    ["created_at", ">", date("Y-m-d", (time() - 5*24*60*60))]
+                ])
+                ->whereNull('user_id')
+                ->count();
+
+        /*$WelcomeCodes->code = 222;
+        $WelcomeCodes->author_id = Auth::user()->id;
+        $WelcomeCodes->save();*/
+        $BadEmailsReg = new \App\Models\BadEmailsReg;
+        $code = $bad_email = $BadEmailsReg::where("email", 'aa@aa.ru')->get();
         
+        return view('admin', ["tables"=>$tables, "code"=>$code]);
+        //return view('admin', ["tables"=>$tables]);
+        
+    }
+    public function getTable(Request $request)
+    {
         //запрос "DESCRIBE `имя таблицы`" выводит описание полей таблицы
-        
-        return view('admin', ["tables"=>$ar]);
-        
+        $ar = $this->getTableNames();
+        $tables = array_keys($ar);
+        $name = $request->input('name');
+        if(!$name || !in_array($name, $tables)) return response('bad input name', 400);
+        $offset = $request->input('offset')?$request->input('offset'):0;
+        $table = DB::table($name)
+            ->offset($offset)
+            ->take(25)
+            ->get();
+        $count = DB::table($name)->count();
+        return ["table"=>$table, "count"=>$count];
     }
     
-    /*
-     * Список молитвенных нужды, которыми поделились
-     * 
-     */
-    public function prayersList()
+    public function deleteRowInTable(Request $request)
     {
-        $MN = DB::table("mn")
-            ->join('mn_user__rs', 'mn.id', '=', 'mn_user__rs.mn_id')
-            ->join('users', 'mn.author_id', '=', 'users.id')
-            ->select('mn.*', 'users.name as author_name')
-            ->where('mn_user__rs.user_id', Auth::user()->id)
-            ->whereNull('end_date')
-            ->orderBy('updated_at', 'desc')
-            ->take(30)
-            ->get();
-            
-        return view('prayersList', ["arMN"=>$MN]);
+        $name = $request->input('name');
+        $ar = $this->getTableNames();
+        $tables = array_keys($ar);
+        if(!$name || !in_array($name, $tables)) return response('bad input name', 400);
+        
+        $offset = $request->input('offset')?$request->input('offset'):0;
+        $table = DB::table($name)
+            ->where("id", intval($request->input('id')))
+            ->delete();
+        return 'delete is success';
     }
     
-    /*
-     * Список моих завершенных молитв
-     */
-    public function prayersEnd()
-    {
-        $MN_model = new \App\Models\MN;
-        $arMN = $MN_model::whereNotNull('end_date')
-            ->orderBy('updated_at', 'desc')
-            ->take(15)
-            ->get();
-        
-        return view('prayersEnd', ["arMN"=>$arMN]);
+    private function getTableNames(){
+        $value = $_ENV['DB_DATABASE'];
+        $ar = DB::select('SHOW TABLES FROM `laravel`', [1]);
+        foreach($ar as $table){
+            $name = 'Tables_in_'.$value;
+            $ar2[$table->$name] = DB::table($table->$name)->count();
+        }
+        return $ar2;
     }
-    /**
-     * Тестовая страница для отработки методов
-     */
-    public function testpage()
-    {
-        return view('test');
-    }
+
 }

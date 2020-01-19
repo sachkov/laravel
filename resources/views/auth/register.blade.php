@@ -60,6 +60,19 @@
                                 <input id="password-confirm" type="password" class="form-control" name="password_confirmation" required>
                             </div>
                         </div>
+                        
+                        <div class="form-group{{ $errors->has('code') ? ' has-error' : '' }}">
+                            <label for="code" class="col-md-4 control-label">Код приглашения</label>
+
+                            <div class="col-md-6">
+                                <input id="code" type="text" class="form-control" name="code" required>
+                                @if ($errors->has('code'))
+                                    <span class="help-block">
+                                        <strong>Не верный код.</strong>
+                                    </span>
+                                @endif
+                            </div>
+                        </div>
 
                         <div class="form-group">
                             <div class="col-md-6 col-md-offset-4">
@@ -74,4 +87,6 @@
         </div>
     </div>
 </div>
+<pre><?print_r($errors)?></pre>
+
 @endsection
