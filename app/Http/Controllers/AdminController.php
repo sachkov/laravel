@@ -79,7 +79,7 @@ class AdminController extends Controller
     
     private function getTableNames(){
         $value = $_ENV['DB_DATABASE'];
-        $ar = DB::select('SHOW TABLES FROM `laravel`', [1]);
+        $ar = DB::select('SHOW TABLES FROM `'.$value.'`', [1]);
         foreach($ar as $table){
             $name = 'Tables_in_'.$value;
             $ar2[$table->$name] = DB::table($table->$name)->count();
