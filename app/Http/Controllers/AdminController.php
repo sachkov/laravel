@@ -27,24 +27,8 @@ class AdminController extends Controller
     public function index()
     {
         $tables = $this->getTableNames();
-        /*$code = 1;
-        $WelcomeCodes = new \App\Models\WelcomeCodes;
-        $code = $WelcomeCodes::select('id')
-                ->where([
-                    ["code", "=", '222'], 
-                    ["created_at", ">", date("Y-m-d", (time() - 5*24*60*60))]
-                ])
-                ->whereNull('user_id')
-                ->count();
-
-        /*$WelcomeCodes->code = 222;
-        $WelcomeCodes->author_id = Auth::user()->id;
-        $WelcomeCodes->save();*/
-        $BadEmailsReg = new \App\Models\BadEmailsReg;
-        $code = $bad_email = $BadEmailsReg::where("email", 'aa@aa.ru')->get();
         
-        return view('admin', ["tables"=>$tables, "code"=>$code]);
-        //return view('admin', ["tables"=>$tables]);
+        return view('admin', ["tables"=>$tables]);
         
     }
     public function getTable(Request $request)
