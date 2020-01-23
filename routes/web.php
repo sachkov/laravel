@@ -32,6 +32,8 @@ Route::post('/personal/generate', 'PersonalController@generate');
 
 Route::post('/personal/createGroup', 'PersonalController@createGroup');
 
+Route::post('/personal/getNotMyGroups', 'PersonalController@getNotMyGroups');
+
 //Маршрут обработки ajax запросов
 Route::post('/ajax/saveMN', 'AjaxController@saveMN');
 

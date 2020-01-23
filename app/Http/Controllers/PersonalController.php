@@ -28,32 +28,34 @@ class PersonalController extends Controller
     public function index()
     {
         $User = new User;
-        $Group = new Group;
+        //$Group = new Group;
 
         $user = $User::find(Auth::user()->id);
         
-        //$groups = Group::has("signed_users.id", Auth::user()->id)->get()->toArray();
 
         $groups = DB::table('user_group')
             ->join("groups", "user_group.group_id", "=", "groups.id")
             ->where('user_id', Auth::user()->id)
-            ->get();
+            ->get()->toArray();
             //понять что возвращяет этот запрос
-        /*foreach($groups as $group){
+        foreach($groups as $group){
             $count = DB::table('user_group')
                 ->where('group_id', $group->id)
                 ->count();
-            $arGroups[] = ["name"=>$group->]
+            $arGroups[] = [
+                "name"=>$group->name, 
+                "number"=>$count, 
+                "id"=>$group->id,
+                "is_author"=>($group->author_id == Auth::user()->id)?"1":"0"
+            ];
+        }
 
-        }*/
-
-        return view('personal.personal', ["user"=>$user, "groups"=>$groups]);
+        return view('personal.personal', ["user"=>$user, "groups"=>$arGroups]);
         
     }
     
     /*
-     * Список молитвенных нужды, которыми поделились
-     * 
+     * Список сгенерированных пользователем кодов и последствия
      */
     public function generateCode()
     {
@@ -116,6 +118,9 @@ class PersonalController extends Controller
         return view('prayersEnd', ["arMN"=>$arMN]);
     }
 
+    /*
+    *   Создание группы и добавление ИД создателя в author_id
+    */
     public function createGroup(Request $request)
     {
         if(Auth::check())
@@ -127,6 +132,30 @@ class PersonalController extends Controller
             $Group->signed_users()->attach(Auth::user()->id);
             
             $out['success'] = $Group->id;;
+        } 
+        else {
+            $out['error'] = 'У вас нет доступа или комментарий пустой';
+        }
+
+        return response()->json( $out );
+
+    }
+
+    /*
+    *   Получение групп на которые не подписан пользователь
+    */
+    public function getNotMyGroups(Request $request)
+    {
+        if(Auth::check())
+        {
+            //$Group = new Group;
+            $groups = [];
+            $groups = DB::table('user_group')
+                ->join("groups", "user_group.group_id", "=", "groups.id")
+                ->where('user_id', "<>", Auth::user()->id)
+                ->get()->toArray();
+            
+            $out['success'] = $groups;
         } 
         else {
             $out['error'] = 'У вас нет доступа или комментарий пустой';

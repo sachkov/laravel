@@ -8,6 +8,9 @@ $( document ).ready(function(){
         if($("#group-name").val() != "")
             createGroup();
     });
+    $("#come-in-group").on("click", function(){
+        getNotMyGroups();
+    });
 });
 /*
  * Запрос на получение кода для приглашения нового пользователя
@@ -55,6 +58,33 @@ function createGroup(){
         data: {
             _token: $('#x_token').val(),
             name: $("#group-name").val()
+        },
+        success: function(data){
+            try{
+                console.log(data);
+            }catch{
+                console.log("createGroup data error!");
+            }
+        },
+        error: function(data) {
+            console.log("createGroup error");
+            console.log(data);
+        }
+    });
+}
+/*
+ * Получение групп в которых не состоит пользователь
+ */
+function getNotMyGroups(){
+    $.ajax({
+        type: "POST",
+        url: "/personal/getNotMyGroups",
+        dataType: "json",
+        headers: {
+            'X-CSRF-TOKEN': $('#x_token').val()
+        },
+        data: {
+            _token: $('#x_token').val()
         },
         success: function(data){
             try{

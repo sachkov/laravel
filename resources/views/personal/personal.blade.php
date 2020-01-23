@@ -12,20 +12,27 @@
         @if(count($groups))
         <h4 class="my_groups">Мои группы</h4>
         <table class="table groups">
-            <tr>
-                <th>Название</th>
-                <th>Покинуть группу</th>
-            </tr>
             @foreach($groups as $group)
             <tr>
-                <td>{{@group['name']}}({{$group['number']}})</td>
+                <td>{{$group['name']}}({{$group['number']}})</td>
                 <td onclick="leave({{$group['id']}})">
-                    <img src="/img/cross.png" alt="покинуть группу">
+                    <button class="btn btn-primary" id="come-in-group">
+                        <span class="d-screen">Покинуть группу</span>
+                        <span class="d-mobile">-</span>
+                    </button>
                 </td>
             </tr>
             @endforeach
         </table>
         @endif
+
+        <h4 class="my_groups">Войти в существующую группу</h4>
+        <select class="groups-select"></select>
+        <button class="btn btn-primary" id="come-in-group">
+            <span class="d-screen">Войти</span>
+            <span class="d-mobile">></span>
+        </button>
+
         <h4 class="my_groups">Создать новую группу</h4>
         <div class="form-group">
             <input type="text" class="form-control" id="group-name" 
@@ -37,4 +44,5 @@
             <span class="d-mobile">+</span>
         </button>
     </div>
+    <pre><?print_r($groups)?></pre>
 @endsection
