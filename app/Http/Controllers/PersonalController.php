@@ -30,7 +30,7 @@ class PersonalController extends Controller
 
         $user = $User::find(Auth::user()->id);
         
-        return view('personal', ["user"=>$user]);
+        return view('personal.personal', ["user"=>$user]);
         
     }
     
@@ -58,7 +58,7 @@ class PersonalController extends Controller
             }
         }
             
-        return view('generateCode', ["invites"=>$invites, "valid_code"=>$code_is_valid]);
+        return view('personal.generateCode', ["invites"=>$invites, "valid_code"=>$code_is_valid]);
     }
 
     /*

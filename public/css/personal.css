@@ -11,3 +11,5 @@
 #new_invite{display: none;}
 
 #invite_code{font-weight: bold;}
+
+#generate{max-height: 60px;}
