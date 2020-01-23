@@ -4,9 +4,13 @@ $( document ).ready(function(){
         generate();
         $(this).hide();
     });
+    $("#create-group").on("click", function(){
+        if($("#group-name").val() != "")
+            createGroup();
+    });
 });
 /*
- * Запрос на получение код для приглашения нового пользователя
+ * Запрос на получение кода для приглашения нового пользователя
  */
 function generate(){
 
@@ -31,6 +35,36 @@ function generate(){
         },
         error: function(data) {
             console.log("generate error");
+            console.log(data);
+        }
+    });
+}
+
+/*
+ * Запрос на создание новой группы
+ */
+function createGroup(){
+
+    $.ajax({
+        type: "POST",
+        url: "/personal/createGroup",
+        dataType: "json",
+        headers: {
+            'X-CSRF-TOKEN': $('#x_token').val()
+        },
+        data: {
+            _token: $('#x_token').val(),
+            name: $("#group-name").val()
+        },
+        success: function(data){
+            try{
+                console.log(data);
+            }catch{
+                console.log("createGroup data error!");
+            }
+        },
+        error: function(data) {
+            console.log("createGroup error");
             console.log(data);
         }
     });

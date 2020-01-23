@@ -30,6 +30,8 @@ Route::get('/personal/invite_friends', 'PersonalController@generateCode')->name(
 
 Route::post('/personal/generate', 'PersonalController@generate');
 
+Route::post('/personal/createGroup', 'PersonalController@createGroup');
+
 //Маршрут обработки ajax запросов
 Route::post('/ajax/saveMN', 'AjaxController@saveMN');
 

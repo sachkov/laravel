@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Model;
             $table->timestamp('end_date')->nullable();
             $table->timestamp('answer_date')->nullable();
             $table->timestamps(); //created_at
+            $table->boolean('no_active')->nullable();  //будем применять для "удаления" МН
  */
 class MN extends Model
 {
@@ -39,12 +40,18 @@ class MN extends Model
         return $this->hasMany("App\Models\mn_user_R", "mn_id");
     }
     
-    public function getArSignedUsersID(){
+    /*public function getArSignedUsersID(){
         $res = [];
         $objRel = $this->signed_user_IDs;
         foreach($objRel as $rel){
             $res[] = $rel->user_id;
         }
         return implode(",",$res);
+    }*/
+
+    public function signed_groups()
+    {
+        return $this->belongsToMany('App\Models\Group');
     }
+
 }

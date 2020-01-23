@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Auth;
 use App\User;
+use App\Models\Group;
 
 class PersonalController extends Controller
 {
@@ -27,10 +28,26 @@ class PersonalController extends Controller
     public function index()
     {
         $User = new User;
+        $Group = new Group;
 
         $user = $User::find(Auth::user()->id);
         
-        return view('personal.personal', ["user"=>$user]);
+        //$groups = Group::has("signed_users.id", Auth::user()->id)->get()->toArray();
+
+        $groups = DB::table('user_group')
+            ->join("groups", "user_group.group_id", "=", "groups.id")
+            ->where('user_id', Auth::user()->id)
+            ->get();
+            //понять что возвращяет этот запрос
+        /*foreach($groups as $group){
+            $count = DB::table('user_group')
+                ->where('group_id', $group->id)
+                ->count();
+            $arGroups[] = ["name"=>$group->]
+
+        }*/
+
+        return view('personal.personal', ["user"=>$user, "groups"=>$groups]);
         
     }
     
@@ -97,5 +114,25 @@ class PersonalController extends Controller
             ->get();
         
         return view('prayersEnd', ["arMN"=>$arMN]);
+    }
+
+    public function createGroup(Request $request)
+    {
+        if(Auth::check())
+        {
+            $Group = new Group;
+            $Group->name = $request->input('name');
+            $Group->author_id = Auth::user()->id;
+            $Group->save();
+            $Group->signed_users()->attach(Auth::user()->id);
+            
+            $out['success'] = $Group->id;;
+        } 
+        else {
+            $out['error'] = 'У вас нет доступа или комментарий пустой';
+        }
+
+        return response()->json( $out );
+
     }
 }
