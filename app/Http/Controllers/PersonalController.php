@@ -31,26 +31,11 @@ class PersonalController extends Controller
         //$Group = new Group;
 
         $user = $User::find(Auth::user()->id);
-        
 
-        $groups = DB::table('user_group')
-            ->join("groups", "user_group.group_id", "=", "groups.id")
-            ->where('user_id', Auth::user()->id)
-            ->get()->toArray();
-            //понять что возвращяет этот запрос
-        foreach($groups as $group){
-            $count = DB::table('user_group')
-                ->where('group_id', $group->id)
-                ->count();
-            $arGroups[] = [
-                "name"=>$group->name, 
-                "number"=>$count, 
-                "id"=>$group->id,
-                "is_author"=>($group->author_id == Auth::user()->id)?"1":"0"
-            ];
-        }
-
-        return view('personal.personal', ["user"=>$user, "groups"=>$arGroups]);
+        return view('personal.personal', [
+                "user"=>$user, 
+                "groups"=>[]
+            ]);
         
     }
     
@@ -87,7 +72,7 @@ class PersonalController extends Controller
     {
         $WelcomeCodes = new \App\Models\WelcomeCodes;
         do{
-            $code = rand(0, 99999);
+            $code = rand(1, 99999);
             $codes = $WelcomeCodes::where([
                 ["code", $code],
                 ["created_at", "<", date("Y-m-d", (time() - 5*24*60*60))]
@@ -95,6 +80,7 @@ class PersonalController extends Controller
                 ->whereNull('user_id')
                 ->count();
         }while($codes > 0);
+
         $WelcomeCodes->code = $code;
         $WelcomeCodes->author_id = Auth::user()->id;
         $WelcomeCodes->save();
@@ -131,10 +117,10 @@ class PersonalController extends Controller
             $Group->save();
             $Group->signed_users()->attach(Auth::user()->id);
             
-            $out['success'] = $Group->id;;
+            $out['success'] = $Group->id;
         } 
         else {
-            $out['error'] = 'У вас нет доступа или комментарий пустой';
+            $out['error'] = 'У вас нет доступа';
         }
 
         return response()->json( $out );
@@ -142,26 +128,102 @@ class PersonalController extends Controller
     }
 
     /*
-    *   Получение групп на которые не подписан пользователь
+    *   Присоединить пользователя к существующей группе
     */
-    public function getNotMyGroups(Request $request)
+    public function addUser(Request $request)
     {
         if(Auth::check())
         {
-            //$Group = new Group;
-            $groups = [];
-            $groups = DB::table('user_group')
-                ->join("groups", "user_group.group_id", "=", "groups.id")
-                ->where('user_id', "<>", Auth::user()->id)
-                ->get()->toArray();
-            
-            $out['success'] = $groups;
+            $this->validate($request, [
+                'group' => 'required|numeric|max:1000',
+              ]);
+
+            $id = DB::table('user_group')->insertGetId(
+                [   
+                    'user_id' => Auth::user()->id, 
+                    'group_id' => $request->input('group')
+                ]
+            );
+            if($id) $out['success'] = $id;
+            else $out['error'] = 'ошибка вставки в таблицу';
         } 
         else {
-            $out['error'] = 'У вас нет доступа или комментарий пустой';
+            $out['error'] = 'У вас нет доступа';
         }
 
         return response()->json( $out );
+    }
+    
+    /*
+        Выход пользователя из группы
+    */
+    public function leaveGroup(Request $request)
+    {
+        if(Auth::check()){ 
+            $this->validate($request, [
+                'group' => 'required|numeric|max:1000',
+              ]);
 
+            DB::table('user_group')
+                ->where(
+                [   
+                    ['user_id', '=', Auth::user()->id], 
+                    ['group_id', '=', $request->input('group')]
+                ])
+                ->delete();
+            $out['success'] = 'Удаление завершено';
+        }else{
+            $out['error'] = 'У вас нет доступа';
+        }
+
+        return response()->json( $out );
+    }
+    /*
+        Получение по ajax групп на которые не подписан пользователь
+    */
+    public function getGroups()
+    {
+        //Получаем id групп в которых состоит пользователь
+        if(Auth::check()){ 
+            $out = ["groups"=>$this->getAllGroups()];
+        }else{
+            $out['error'] = 'У вас нет доступа';
+        }
+
+        return response()->json( $out );
+    }
+
+    /*
+    *   Получение групп в которых состоит или не состоит пользователь
+    */
+    private function getAllGroups()
+    {
+        $arGroups = [];
+        //все группы
+        $groups = DB::table('user_group')
+            ->select(DB::raw("
+                count(group_id) as users_count,
+                groups.id,
+                groups.name, 
+                groups.author_id
+            "))
+            ->join("groups", "user_group.group_id", "=", "groups.id")
+            ->groupBy('group_id')->get();
+        //id групп куда входит пользователь
+        $user_groups = DB::table("user_group")
+            ->where("user_id", Auth::user()->id)
+            ->get();
+        foreach($user_groups as $group)
+            $arGroupid[] = $group->group_id;
+        foreach($groups as $group){
+            $arGroups[] = [
+                "name"=>$group->name, 
+                "number"=>$group->users_count, 
+                "id"=>$group->id,
+                "is_author"=>($group->author_id == Auth::user()->id)?1:0,
+                "is_member"=>intval(in_array($group->id, $arGroupid))
+            ];
+        }
+        return $arGroups;
     }
 }
