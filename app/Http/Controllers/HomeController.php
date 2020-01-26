@@ -24,16 +24,8 @@ class HomeController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function index()
-    {
-        /*$MN_model = new \App\Models\MN;
-
-        $arMN = $MN_model::whereNull('end_date')
-            ->orderBy('updated_at', 'desc')
-            ->take(15)
-            ->get();*/
-        
+    {   
         return view('home');
-        
     }
     
     /*
@@ -42,18 +34,37 @@ class HomeController extends Controller
      */
     public function prayersList()
     {
+        //DB::enableQueryLog();
         $MN_model = new \App\Models\MN;
-
         $MN = $MN_model
-            ->join('mn_user__rs', 'mn.id', '=', 'mn_user__rs.mn_id')
-            ->join('users', 'mn.author_id', '=', 'users.id')
-            ->select('mn.*', 'users.name as author_name')
-            ->where('mn_user__rs.user_id', Auth::user()->id)
+            ->distinct()
+            ->leftJoin('mn_user__rs', 'mn.id', '=', 'mn_user__rs.mn_id')
+            ->leftJoin('mn_group', 'mn.id', '=', 'mn_group.mn_id')
+            //->join('users', 'mn.author_id', '=', 'users.id')
+            //->select('mn.*', 'users.name as author_name')
+            ->select('mn.*')
+            ->where('author_id', '<>', Auth::user()->id)
             ->whereNull('end_date')
-            ->orderBy('updated_at', 'desc')
+            ->where(function ($query) {
+                    $groups = [];
+                    $gr = DB::table('user_group')
+                        ->select("group_id")
+                        ->where('user_id', Auth::user()->id)
+                        ->get();
+                    foreach($gr as $group)
+                        $groups[] = $group->group_id;
+                    
+                    if(count($groups))
+                        $query->whereIn('mn_group.group_id', $groups)
+                            ->orWhere('mn_user__rs.user_id', '=', Auth::user()->id);
+                    else
+                        $query->where('mn_user__rs.user_id', '=', Auth::user()->id);
+                })
+            //->where('mn_user__rs.user_id', '=', Auth::user()->id)
+            ->orderBy('mn.updated_at', 'desc')
             ->take(30)
             ->get();
-            
+            //dd(DB::getQueryLog());
         return view('prayersList', ["arMN"=>$MN]);
     }
     

@@ -21,6 +21,18 @@
             </div>
             <input type="text" class="form-control" id="input-user" placeholder="Начните вводить имя или фамилию">
         </div>
+
+        <div class="form-group">
+            <label for="input-user">Видно группам</label>
+            <div class="users-list">
+                <span class="users-list-text" v-for="(item,i) in add_groups_table">
+                        @{{item.label}}
+                    <span class="x-del" @click="del_gr(i)">X</span>
+                </span>
+            </div>
+            <input type="text" class="form-control" id="input-group" placeholder="Начните вводить название группы">
+        </div>
+        
         <div class="form-group">
             <label for="textarea-descr">Описание</label>
             <textarea class="form-control" id="textarea-descr" rows="3"></textarea>
@@ -100,6 +112,16 @@
             </div>
             <input type="text" class="form-control" id="share-edit" placeholder="Начните вводить имя или фамилию">
         </div>
+        <div class="form-group" v-show="!edit.is_thanks">
+            <label for="share-edit">Видно группам</label>
+            <div class="users-list">
+                <span class="users-list-text" v-for="(item,i) in edit_groups_table">
+                        @{{item.name}}
+                    <span class="x-del" @click="edit_del_gr(i)">X</span>
+                </span>
+            </div>
+            <input type="text" class="form-control" id="groups-edit" placeholder="Начните вводить название группы">
+        </div>
         <div class="btn btn-primary" id="btn-save-edit">Сохранить</div>
         <div id="btn-cancel-edit" class="btn btn-light">Отмена</div>
     </div>
@@ -123,7 +145,7 @@
         <div id="more_btn" class="btn btn-outline-warning" onclick="getMorePrayers()">Еще</div>
     </div>
 
-    <pre><?//print_r($arMN);
+    <pre><?//print_r($ar);
 
     ?></pre>
 </div>

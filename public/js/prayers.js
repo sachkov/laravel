@@ -5,10 +5,12 @@ var vm = new Vue({
         add_users_table: [],
         edit: {},           //Объект - редактируемая в данный момент нужда
         done: {},           //Завершаемая в данный момент нужда
-        text: '',
         arUsers: [],
         edit_users_table: [],
         is_thanks: 0,           //Является ли нужда - благодарностью
+        groups_table: [],       //Основной массив с группами
+        add_groups_table: [],   //Список групп при добавлении мн
+        edit_groups_table: [],  //Список групп при редактировании мн
     },
     methods:{
         del: function(a){
@@ -33,6 +35,7 @@ var vm = new Vue({
                 $(".edit-form").show();
                 vm.edit = vm.mainTable[indx];
                 vm.edit_users_table = vm.mainTable[indx].users;
+                vm.edit_groups_table = vm.mainTable[indx].groups;
             }
         },
         show_done_form(indx, event){
@@ -51,14 +54,14 @@ var vm = new Vue({
                 $(".done-form").show();
                 vm.done = vm.mainTable[indx];
             }
-        }
+        },
+        del_gr: function(a){
+            vm.add_groups_table.splice(a,1);
+        },
+        edit_del_gr: function(a){
+            vm.edit_groups_table.splice(a,1);
+        },
     },
-    /*watch: {
-
-    },*/
-    /*computed: {
-
-    }*/
 });
 
 var arUsers = {}; //Список всех пользователей
@@ -73,6 +76,8 @@ $( document ).ready(function(){
             getTable();//Получение основной таблицы молитвенных нужд
             
             getUsers();//Получение списка пользователей для "поделится"
+
+            getGroups();//Получение списка групп для "поделится"
         }
     }
 
@@ -94,6 +99,7 @@ $( document ).ready(function(){
         $("#textarea-descr").val("");
         $("#input-user").val("");
         vm.add_users_table = [];
+        vm.add_groups_table = [];
     });
     
     //Нажатие на "Сохранить" (Редактирование МН)
@@ -207,9 +213,13 @@ function saveMN(){
         });
         return false;
     }
-    var res = [];
+    let res = [];
+    let resG = [];
     for(i in vm.add_users_table){
         res.push(vm.add_users_table[i].value);
+    }
+    for(i in vm.add_groups_table){
+        resG.push(vm.add_groups_table[i].value);
     }
     //отправка ajax
     $.ajax({
@@ -223,7 +233,8 @@ function saveMN(){
             _token: $('#x_token').val(),
             name: name,
             text: $("#textarea-descr").val(),
-            users: JSON.stringify(res)
+            users: JSON.stringify(res),
+            groups: JSON.stringify(resG),
         },
         success: function(data){
             $("#create-form").hide();
@@ -241,18 +252,16 @@ function closeEditForm(){
     $("#descr-edit").val("");
     $("#result-edit").val("");
     vm.edit_users_table = [];
+    vm.edit_groups_table = [];
     $(".mn-act.active").removeClass("active");
     $(".edit-form").hide();
-    //$("#container-"+MNeditID).hide();
-    //MNeditID = 0;
 }
 //Закрытие формы завершения
 function closeDoneForm(){
     vm.edit_users_table = [];
+    vm.edit_groups_table = [];
     $(".mn-act.active").removeClass("active");
     $(".done-form").hide();
-    //$("#container-"+MNeditID).hide();
-    //MNeditID = 0;
 }
 /*
  * Завершение публикации молитвы с возможностью добавить результат
@@ -307,7 +316,8 @@ function saveDoneForm(id = 0){
 
 function editMN(){
     // Находим массив ID пользователи, с которыми поделились молитвой
-    var res = [];
+    let resU = [];
+    let resG = [];
     //var name = $("#name-edit").val();
     var name = vm.edit.name;
     if(!name || name.length < 3){
@@ -319,7 +329,10 @@ function editMN(){
     }
     //var description = $("#descr-edit").val();
     for(i in vm.edit_users_table){
-        res.push(vm.edit_users_table[i].id);
+        resU.push(vm.edit_users_table[i].id);
+    }
+    for(i in vm.edit_groups_table){
+        resG.push(vm.edit_groups_table[i].id);
     }
     //отправка ajax
     $.ajax({
@@ -337,7 +350,8 @@ function editMN(){
             //text: description,
             text: vm.edit.description,
             result: vm.edit.answer,
-            users: JSON.stringify(res)
+            users: JSON.stringify(resU),
+            groups: JSON.stringify(resG),
         },
         success: function(data){
             //Изменение значений в таблице и закрытие формы редактирования
@@ -357,4 +371,70 @@ function editMN(){
 function getMorePrayers(){
     var offset = vm.mainTable.length;
     getTable(offset);
+}
+
+///////Функционал групп ////////
+/*
+    Получение всех групп
+*/
+function getGroups(){
+    $.ajax({
+        type: "POST",
+        url: "/personal/getGroups",
+        dataType: "json",
+        data: {
+            _token: $('#x_token').val()
+        },
+        success: function(data){
+            try{
+                groups_table = data.groups;
+                fillAutocomplite(data.groups);
+            }catch{
+                console.log("getGroups data error!");
+            }
+        },
+        error: function(data) {
+            console.log("getGroups error");
+            console.log(data);
+        }
+    });
+}
+/*
+*   Наполнение автокомплита для поиска существующих групп
+*/
+function fillAutocomplite(groups){
+    let table = [];
+    for(x in groups){
+        if(groups[x].is_member){
+            table.push({
+                'value': groups[x].id,
+                'label':groups[x].name
+            });
+        }
+    }
+    $('#input-group').autocomplete({
+        minLength: 1,
+        source: table,
+        select: function( event, ui ) {
+            vm.add_groups_table.push(ui.item);
+            return false;
+        },
+        change: function( event, ui ) {
+            $("#input-group").val("");
+        }
+    });
+    $('#groups-edit').autocomplete({
+        minLength: 1,
+        source: table,
+        select: function( event, ui ) {
+            vm.edit_groups_table.push({
+                name: ui.item.label, 
+                id: parseInt(ui.item.value,10)
+            });
+            return false;
+        },
+        change: function( event, ui ) {
+            $("#groups-edit").val("");
+        }
+    });
 }

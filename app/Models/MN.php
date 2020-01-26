@@ -51,7 +51,7 @@ class MN extends Model
 
     public function signed_groups()
     {
-        return $this->belongsToMany('App\Models\Group');
+        return $this->belongsToMany('App\Models\Group', 'mn_group', 'mn_id', 'group_id');
     }
 
 }
