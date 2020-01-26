@@ -8,9 +8,14 @@
 
 .p_content .table{margin-top: 10px;}
 
-.table_groups{display: none;}
+.group_edit{
+    line-height: 1.5;
+    border: none;
+    padding: 6px 12px;
+}
 
 .personal-btn{
+    margin: 0 5px;
     cursor: pointer;
     color: #fff;
     background-color: #007bff;

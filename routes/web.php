@@ -38,6 +38,10 @@ Route::post('/personal/addUser', 'PersonalController@addUser');
 
 Route::post('/personal/leaveGroup', 'PersonalController@leaveGroup');
 
+Route::post('/personal/delGroup', 'PersonalController@delGroup');
+
+Route::post('/personal/changeGroupName', 'PersonalController@changeGroupName');
+
 //Маршрут обработки ajax запросов
 Route::post('/ajax/saveMN', 'AjaxController@saveMN');
 

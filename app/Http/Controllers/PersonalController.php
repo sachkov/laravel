@@ -178,6 +178,69 @@ class PersonalController extends Controller
 
         return response()->json( $out );
     }
+
+    /*
+        Удаление группы
+    */
+    public function delGroup(Request $request)
+    {
+        if(Auth::check()){ 
+            $this->validate($request, [
+                'group' => 'required|numeric|max:1000',
+              ]);
+            $group = DB::table('groups')
+              ->where([
+                  ['author_id', '=',Auth::user()->id],
+                  ['id', '=', $request->input('group')]
+              ])
+              ->first();
+            if($group->id == $request->input('group')){
+                DB::table('groups')
+                    ->where('id', $request->input('group'))
+                    ->delete();
+                $out['success'] = 'Удаление завершено';
+            }else{
+                $out['error'] = 'Удалить можно только собственную группу.';
+            }
+        }else{
+            $out['error'] = 'У вас нет доступа';
+        }
+
+        return response()->json( $out );
+    }
+
+    /*
+        Изменение наименования группы
+    */
+    public function changeGroupName(Request $request)
+    {
+        if(Auth::check()){ 
+            $this->validate($request, [
+                'id' => 'required|numeric|max:1000',
+                'name' => ['required', 'regex:/^[\w-\dА-Яа-я" ]{0,100}$/']
+              ]);
+            $group = DB::table('groups')
+              ->where([
+                  ['author_id', '=', Auth::user()->id],
+                  ['id', '=', $request->input('id')]
+              ])
+              ->first();
+            if($group->id == $request->input('id')){
+               
+                $group_model = Group::find($group->id);
+                $group_model->name = $request->input('name');
+                $group_model->save();
+                $out['success'] = 'Группа переименована';
+            }else{
+                $out['error'] = 'Переименовать можно только собственную группу.';
+            }
+        }else{
+            $out['error'] = 'У вас нет доступа';
+        }
+
+        return response()->json( $out );
+    }
+
     /*
         Получение по ajax групп на которые не подписан пользователь
     */

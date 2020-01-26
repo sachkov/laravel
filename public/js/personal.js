@@ -68,7 +68,7 @@ function createGroup(){
         },
         success: function(data){
             try{
-                console.log(data);
+                console.log(data);at
             }catch{
                 console.log("createGroup data error!");
             }
@@ -80,19 +80,76 @@ function createGroup(){
     });
 }
 ////////Покидание группы, удаление и переименование//////////
-function leave(group_id){
-    globalAjax(
-        "/personal/leaveGroup",
-        {group: group_id},
-        function(data){
-            location.reload();
+let vm = new Vue({
+    el: '#v-personal-groups',
+    data: {
+        group_table: [],
+        arGroupNames: [],  //массив имен групп для оприделения изменено ли значение
+    },
+    methods: {
+        leave: function(group_indx){
+            globalAjax(
+                "/personal/leaveGroup",
+                {group: vm.group_table[group_indx].id},
+                function(data){
+                    vm.group_table.splice(group_indx,1);
+                    //location.reload();
+                },
+                ()=>{}
+            );
         },
-        ()=>{}
-    );
+        del_group: function(group_indx){
+            globalAjax(
+                "/personal/delGroup",
+                {group: vm.group_table[group_indx].id},
+                function(data){
+                    if(data.success)
+                        vm.group_table.splice(group_indx,1);
+                },
+                ()=>{}
+            );
+        },
+        saveName: function(group_indx){
+            vm.arGroupNames[group_indx] = 
+                vm.group_table[group_indx].name;
+        },
+        changeName: function(group_indx){
+            if(vm.group_table[group_indx].name !=
+                vm.arGroupNames[group_indx]
+            ){
+                globalAjax(
+                    "/personal/changeGroupName",
+                    {
+                        name: vm.group_table[group_indx].name,
+                        id: vm.group_table[group_indx].id
+                    },
+                    function(data){
+                        console.log(data);
+                    },
+                    ()=>{}
+                );
+            }
+            
+        },
+    }
+});
+
+/* 
+* Наполнение таблицы моих групп
+Данные для таблицы получаем в запросе getGroups
+*/
+function fillTable(groups){
+    for(x in groups){
+        if(groups[x].is_member){
+            vm.group_table.push(groups[x]);
+        }
+    }
 }
 
-///////Получение всех групп//////
+/////////// Получение всех групп ////////////
+
 let selected_group_id = 0;  //ID группы в которую хочет вступить
+let allGroups = [];         //Массив всех групп
 /*
  * Получение всех групп
  */
@@ -109,7 +166,8 @@ function getGroups(){
         },
         success: function(data){
             try{
-                console.table(data.groups);
+                //console.table(data.groups);
+                allGroups = data.groups;
                 fillTable(data.groups);
                 fillAutocomplite(data.groups);
             }catch{
@@ -133,40 +191,14 @@ function addUser(){
         "/personal/addUser",
         {group: selected_group_id},
         function(data){
-            console.log(data);
-            location.reload();
+            //location.reload();
+            for(x in allGroups)
+                if(allGroups[x].id == selected_group_id)
+                    break;
+            vm.group_table.push(allGroups[x]);
         },
         function(){}
     );
-}
-/* 
-* Наполнение таблицы моих групп  
-*/
-function fillTable(groups){
-    let html = "";
-    for(x in groups){
-        if(groups[x].is_member){
-            $('.table_groups').show();
-            html += '<tr><td>';
-            if(groups[x].is_author){
-                html += '<input class="group_edit" value="';
-            }
-            html += groups[x].name+'('+groups[x].number+')';
-            if(groups[x].is_author){
-                html += '">';
-            }
-            html += '</td><td><button class="personal-btn"';
-            html += 'onclick="leave('+groups[x].id+')">';
-            html += 'Покинуть группу</button>';
-            if(groups[x].is_author){
-                html += '<button class="personal-btn"';
-                html += 'onclick="del_group('+groups[x].id+')">';
-                html += 'Удалить группу</button>';
-            }
-            html += '</td></tr>';
-        }
-    }
-    $('.table_groups table').html(html);
 }
 
 /*
@@ -186,7 +218,7 @@ function fillAutocomplite(groups){
         minLength: 1,
         source: data,
         select: function( event, ui ) {
-            console.log(ui.item);
+            //console.log(ui.item);
             selected_group_id = ui.item.value;
             $('#select-group').val(ui.item.label);
             $("#come-in-group").addClass("act");
@@ -201,6 +233,10 @@ function fillAutocomplite(groups){
     });
 }
 
+
+/*
+*   Хелпер для более короткого написания запроса
+*/
 function globalAjax(method, params, suc, er){
     params["_token"] = $('#x_token').val();
     $.ajax({

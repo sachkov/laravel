@@ -8,23 +8,36 @@
     </h3>
     <div class="name">{{$user->name}}</div>
     <div class="email">{{$user->email}}</div>
-    <div class="users-groups">
+    <div class="users-groups" id="v-personal-groups">
 
         <div class="table_groups">
-            <h4 class="my_groups">Мои группы</h4>
-            <table class="table groups">
-                @foreach($groups as $group)
-                <tr>
-                    <td>{{$group['name']}}({{$group['number']}})</td>
-                    <td onclick="leave({{$group['id']}})">
-                        <button class="btn btn-primary" id="come-in-group">
-                            <span class="d-screen">Покинуть группу</span>
-                            <span class="d-mobile">-</span>
-                        </button>
-                    </td>
-                </tr>
-                @endforeach
-            </table>
+            <div v-show="group_table.length">
+                <h4 class="my_groups">Мои группы</h4>
+                <table class="table groups">
+
+                    <tr v-for="(group, indx) in group_table">
+                        <td v-if="group.is_author">
+                            <input class="group_edit" 
+                                v-model="group.name"
+                                @focus="saveName(indx)"
+                                @blur="changeName(indx)">
+                        </td>
+                        <td v-else>
+                            @{{group.name}}(@{{group.number}})
+                        </td>
+                        <td>
+                            <button @click="leave(indx)"
+                            class="btn btn-primary">Покинуть группу
+                            </button>
+                            <button @click="del_group(indx)"
+                            v-if="group.is_author"
+                            class="btn btn-primary">Удалить группу
+                            </button>
+                        </td>
+                    </tr>
+
+                </table>
+            </div>
         </div>
 
         <h4 class="my_groups">Поиск существующей группы</h4>
