@@ -39,7 +39,7 @@ var vm = new Vue({
             }
         },
         show_done_form(indx, event){
-            if($(event.target).hasClass("active")){
+            /*if($(event.target).hasClass("active")){
                 closeDoneForm();
             }else{
                 //Если опубликована благодарность то ее можно только закрыть
@@ -53,7 +53,8 @@ var vm = new Vue({
                 $("#container-"+indx).append($(".done-form"));
                 $(".done-form").show();
                 vm.done = vm.mainTable[indx];
-            }
+            }*/
+            //$(".drop-down-menu").css("top", '200px');
         },
         del_gr: function(a){
             vm.add_groups_table.splice(a,1);
@@ -437,4 +438,9 @@ function fillAutocomplite(groups){
             $("#groups-edit").val("");
         }
     });
+}
+
+function drop(btn){
+    $(btn).parents(".mn-item").append($(".drop-down-menu"));
+    $(".drop-down-menu").css("opacity", '1');
 }

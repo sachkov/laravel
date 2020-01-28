@@ -68,8 +68,7 @@
                             Редактировать
                         </button>
                         <button type="button" class="btn btn-outline-success btn-sm mn-act"
-                            @click="show_done_form(indx, $event)"
-                            onclick="drop(this)">
+                            @click="show_done_form(indx, $event)">
                             Завершить
                         </button>
                     </div>
@@ -146,15 +145,9 @@
         <div id="more_btn" class="btn btn-outline-warning" onclick="getMorePrayers()">Еще</div>
     </div>
 
-    <nav class="drop-down-menu">
-        <ul class="ddm-ul">
-            <li class="ddm-li">редактировать</li>
-            <li class="ddm-li">завершить</li>
-            <li class="ddm-li">удалить</li>
-        </ul>
-    </nav>
+    <pre><?//print_r($ar);
 
-    <pre><?//print_r($ar);?></pre>
+    ?></pre>
 </div>
 <script>
     let auth = true;
