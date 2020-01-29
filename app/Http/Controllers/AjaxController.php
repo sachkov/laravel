@@ -46,6 +46,7 @@ class AjaxController extends Controller
             if($request->input('offset'))
                 $offset = $request->input('offset');
             $prayers = $MN_model::where('author_id', Auth::user()->id)
+                ->whereNull('no_active')
                 ->whereNull('end_date')
                 ->orderBy('updated_at', 'desc')
                 ->offset($offset)
@@ -149,6 +150,26 @@ class AjaxController extends Controller
             $MN_model->save();
             
             $out['success'] = $request->input('id');
+        }else{
+            $out['error'] = 'У вас нет доступа или комментарий пустой';
+        }
+        return response()->json( $out );
+    }
+
+    /*
+    *   "Удаление нужды" - ставим 1 в столбец 'no_active'
+    */
+    public function deleteMN(Request $request)
+    {
+        if(Auth::check()){
+            if(preg_match('#^\d{1,6}$#', intval($request->input('id')))){
+                $MN_model = \App\Models\MN::find($request->input('id'));
+                $MN_model->no_active = 1;
+                $MN_model->save();
+                $out['result'] = $request->input('id');
+            }else{
+                $out['input error'] = 'Не верный входной параметр id';
+            }
         }else{
             $out['error'] = 'У вас нет доступа или комментарий пустой';
         }

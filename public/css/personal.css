@@ -42,13 +42,39 @@
 #generate{max-height: 60px;}
 
 .my_groups{margin-top: 10px;}
-.users-groups{max-width: 600px;}
+.users-groups{max-width: 700px;}
 .users-groups .form-group{display: inline-block;}
-.users-groups .form-control{width: 350px}
+.users-groups .form-control,
+.users-groups .group_name{width: 350px;}
+.users-groups td{padding: 10px 0;}
+.users-groups .group_name input{width: 100%;}
 .d-mobile{display: none;}
-@media (max-width:480px){
-.users-groups .form-control{width: 280px}
-.d-screen{display: none;}
-.d-mobile{display: inline;}
-.users-groups span.d-mobile{font-weight: bold;}
+    @media (max-width:480px){
+    .users-groups .form-control,
+    .users-groups .group_name{width: 280px;}
+    .d-screen{display: none;}
+    .d-mobile{display: inline;}
+    .users-groups span.d-mobile{font-weight: bold;}
+    .personal-btn{
+        margin: 0 5px 0 0;
+        background-repeat: no-repeat;
+        background-position: center;
+    }
+    .personal-btn.leave{
+        background-image: url('../img/exit.png');
+    }
+    .personal-btn.delete{
+        background-image: url('../img/delete.svg');
+        background-size: contain;
+    }
+    #come-in-group{
+        background-image: url('../img/enter.png');
+    }
+    #create-group{
+        background-image: url('../img/edit_white.svg');
+    }
+}
+@media (max-width:390px){
+    .users-groups .form-control{width: 250px;}
+    .users-groups .group_name{width: 220px;}
 }

@@ -96,6 +96,7 @@ class PersonalController extends Controller
         $MN_model = new \App\Models\MN;
         $arMN = $MN_model
             ->whereNotNull('end_date')
+            ->whereNull('no_active')
             ->where('author_id', Auth::user()->id)
             ->orderBy('updated_at', 'desc')
             ->take(15)
@@ -217,7 +218,7 @@ class PersonalController extends Controller
         if(Auth::check()){ 
             $this->validate($request, [
                 'id' => 'required|numeric|max:1000',
-                'name' => ['required', 'regex:/^[\w-\dА-Яа-я" ]{0,100}$/']
+                'name' => ['required', 'regex:/^[\w-\d\sА-Яа-я"()\. ]{0,100}/u']
               ]);
             $group = DB::table('groups')
               ->where([
@@ -262,6 +263,7 @@ class PersonalController extends Controller
     private function getAllGroups()
     {
         $arGroups = [];
+        $arGroupid = [];
         //все группы
         $groups = DB::table('user_group')
             ->select(DB::raw("

@@ -8,9 +8,10 @@ var vm = new Vue({
         arUsers: [],
         edit_users_table: [],
         is_thanks: 0,           //Является ли нужда - благодарностью
-        groups_table: [],       //Основной массив с группами
+        is_groups_table: false,    //Состоит ли пользователь в группах
         add_groups_table: [],   //Список групп при добавлении мн
         edit_groups_table: [],  //Список групп при редактировании мн
+        active_index: 0,        //индекс элемента списка, на котором открыли меню
     },
     methods:{
         del: function(a){
@@ -24,37 +25,45 @@ var vm = new Vue({
             temp.description_show = !temp.description_show;
             vm.$set(vm.mainTable, indx, temp);
         },
-        show_edit_form(indx, event){
-            if($(event.target).hasClass("active")){
+        show_edit_form(){
+            if($(".edit-form").is(":visible")){
                 closeEditForm();
             }else{
                 closeDoneForm();//на всякий случай прячем форму завершения
                 
-                $(event.target).addClass("active");
-                $("#container-"+indx).append($(".edit-form"));
+                $("#container-"+vm.active_index).append($(".edit-form"));
                 $(".edit-form").show();
-                vm.edit = vm.mainTable[indx];
-                vm.edit_users_table = vm.mainTable[indx].users;
-                vm.edit_groups_table = vm.mainTable[indx].groups;
+                vm.edit = vm.mainTable[vm.active_index];
+                vm.edit_users_table = vm.mainTable[vm.active_index].users;
+                vm.edit_groups_table = vm.mainTable[vm.active_index].groups;
             }
+            vm.active_index = 0;
         },
-        show_done_form(indx, event){
-            /*if($(event.target).hasClass("active")){
+        show_done_form(){
+            if($(".done-form").is(":visible")){
                 closeDoneForm();
             }else{
                 //Если опубликована благодарность то ее можно только закрыть
-                if(vm.mainTable[indx].is_thanks){
-                    saveDoneForm(vm.mainTable[indx].id);
+                if(vm.mainTable[vm.active_index].is_thanks){
+                    saveDoneForm(vm.mainTable[vm.active_index].id);
                     return true;
                 }
                 closeEditForm();//на всякий случай прячем форму редактирования
                 
-                $(event.target).addClass("active");
-                $("#container-"+indx).append($(".done-form"));
+                $("#container-"+vm.active_index).append($(".done-form"));
                 $(".done-form").show();
-                vm.done = vm.mainTable[indx];
-            }*/
-            //$(".drop-down-menu").css("top", '200px');
+                vm.done = vm.mainTable[vm.active_index];
+            }
+            vm.active_index = 0;
+        },
+        del_mn(){
+            deleteMN(vm.active_index);
+            vm.active_index = 0;
+        },
+        drop(indx, e){
+            $(e.target).parents(".list-item").append($(".drop-down-menu"));
+            $(".drop-down-menu").show();
+            vm.active_index = indx;
         },
         del_gr: function(a){
             vm.add_groups_table.splice(a,1);
@@ -82,6 +91,17 @@ $( document ).ready(function(){
         }
     }
 
+    //Нажатие на любое место на странице
+    $('body').on("click", function(e){
+        //..Закрывает меню списка
+        if( !$(".mn-btn").is(e.target)
+            && 
+            $(".mn-btn").has(e.target).length === 0
+        ){
+            $(".drop-down-menu").hide();
+            vm.active_index = 0;
+        }
+    });
     //Нажатие на "Добавить"
     $("#btn-add-mn").on("click",function(){
         $(this).parent().hide();
@@ -176,6 +196,7 @@ function getUsers(){
             for(x in data){
                 arUsers.push({label: data[x], value:x});
             }
+            console.log(arUsers);
             $("#input-user").autocomplete({
                 minLength: 1,
                 source: arUsers,
@@ -365,7 +386,28 @@ function editMN(){
         }
     });
 }
-
+/*
+*   Удалить (скрыть) нужду
+*/
+function deleteMN(indx){
+    $.ajax({
+        type: "POST",
+        url: "/ajax/deleteMN",
+        dataType: "json",
+        data: {
+            _token: $('#x_token').val(),
+            id: vm.mainTable[indx].id,
+        },
+        success: function(data){
+            //Удалить нужду из таблицы
+            if(data.result == vm.mainTable[indx].id)
+                vm.mainTable.splice(indx,1);
+        },
+        error: function() {
+            console.log("deleteMN error");
+        }
+    });
+}
 /*
  * Загрузка дополнительных нужд
  */
@@ -387,12 +429,11 @@ function getGroups(){
             _token: $('#x_token').val()
         },
         success: function(data){
-            try{
-                groups_table = data.groups;
+            //try{
                 fillAutocomplite(data.groups);
-            }catch{
-                console.log("getGroups data error!");
-            }
+            //}catch{
+                //console.log("getGroups data error!");
+            //}
         },
         error: function(data) {
             console.log("getGroups error");
@@ -408,11 +449,13 @@ function fillAutocomplite(groups){
     for(x in groups){
         if(groups[x].is_member){
             table.push({
-                'value': groups[x].id,
-                'label':groups[x].name
+                label: groups[x].name,
+                value: groups[x].id
             });
         }
     }
+    
+    vm.is_groups_table = table.length > 0;
     $('#input-group').autocomplete({
         minLength: 1,
         source: table,
@@ -424,6 +467,8 @@ function fillAutocomplite(groups){
             $("#input-group").val("");
         }
     });
+    $('#input-group').addClass("test");
+    console.log(table);
     $('#groups-edit').autocomplete({
         minLength: 1,
         source: table,
@@ -439,8 +484,9 @@ function fillAutocomplite(groups){
         }
     });
 }
-
-function drop(btn){
-    $(btn).parents(".mn-item").append($(".drop-down-menu"));
-    $(".drop-down-menu").css("opacity", '1');
-}
+/*
+function drop(btn, indx){
+    $(btn).parents(".list-item").append($(".drop-down-menu"));
+    $(".drop-down-menu").show();
+    vm.active_index = indx;
+}*/

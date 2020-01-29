@@ -45,6 +45,7 @@ class HomeController extends Controller
             ->select('mn.*')
             ->where('author_id', '<>', Auth::user()->id)
             ->whereNull('end_date')
+            ->whereNull('no_active')
             ->where(function ($query) {
                     $groups = [];
                     $gr = DB::table('user_group')

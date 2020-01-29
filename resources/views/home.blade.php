@@ -22,7 +22,7 @@
             <input type="text" class="form-control" id="input-user" placeholder="Начните вводить имя или фамилию">
         </div>
 
-        <div class="form-group">
+        <div class="form-group" v-show="is_groups_table">
             <label for="input-user">Видно группам</label>
             <div class="users-list">
                 <span class="users-list-text" v-for="(item,i) in add_groups_table">
@@ -47,44 +47,32 @@
     
     
     <div class="prayers-main-table">
-        <div class="t-tr thead">
-            <div class="t-td t-date">Дата</div>
-            <div class="t-td t-name">Название</div>
-            <div class="t-td t-action">Действия</div>
-        </div>
         <div class="tbody">
             
-            <div class="mn-item" v-for="(mn, indx) in mainTable" v-bind:key="indx">
-                <div class="t-tr" :data-mnid="mn.id">
-                    <div class="t-td t-date" title="Дата" >@{{mn.created_at}}</div>
-                    <div class="t-td t-name" title="Название">@{{mn.name}}</div>
-                    <div class="t-td t-action" title="Действия">
-                        <button type="button" class="btn btn-outline-primary btn-sm mn-show"
-                            @click="toggle_description(indx)">
-                            @{{mn.description_show?'Скрыть описание':'Показать описание'}}
-                        </button>
-                        <button type="button" class="btn btn-outline-info btn-sm mn-act"
-                            @click="show_edit_form(indx, $event)">
-                            Редактировать
-                        </button>
-                        <button type="button" class="btn btn-outline-success btn-sm mn-act"
-                            @click="show_done_form(indx, $event)"
-                            onclick="drop(this)">
-                            Завершить
-                        </button>
+            <div class="list-item" v-for="(mn, indx) in mainTable" v-bind:key="indx">
+                <div class="first-line" :data-mnid="mn.id">
+                    <div class="mn-date" title="Дата">@{{mn.created_at}}</div>
+                    <div class="mn-name" title="Название"
+                    @click="toggle_description(indx)">
+                        @{{mn.name}}
                     </div>
-                    <div class="mn-description" v-show="mn.description_show">
-                        <p>@{{mn.description}}</p>
-                        <p>@{{mn.answer}}</p>
-                        <?// В описание можно включить описание видимости данной молитвы?>
+                    <div class="mn-btn" title="Меню"
+                        @click="drop(indx, $event)"
+                        >...
                     </div>
                 </div>
-
+                <div class="mn-description" v-show="mn.description_show">
+                    <p>@{{mn.description}}</p>
+                    <p>@{{mn.answer}}</p>
+                    <?// В описание можно включить описание видимости данной молитвы?>
+                </div>
                 <div v-bind:id="'container-'+indx" class="tr-container"></div>
             </div>
 
         </div>
-        <div class="table_empty" v-if="!mainTable.length">Вы еще не добавили молитвенные нуджы в свой список.</div>
+        <div class="table_empty" v-if="!mainTable.length">
+            На этой странице располагается Ваш список молитвенных нужд, он виден только Вам.
+        </div>
     </div>
 
 
@@ -113,7 +101,7 @@
             </div>
             <input type="text" class="form-control" id="share-edit" placeholder="Начните вводить имя или фамилию">
         </div>
-        <div class="form-group" v-show="!edit.is_thanks">
+        <div class="form-group" v-show="!edit.is_thanks && is_groups_table">
             <label for="share-edit">Видно группам</label>
             <div class="users-list">
                 <span class="users-list-text" v-for="(item,i) in edit_groups_table">
@@ -148,9 +136,9 @@
 
     <nav class="drop-down-menu">
         <ul class="ddm-ul">
-            <li class="ddm-li">редактировать</li>
-            <li class="ddm-li">завершить</li>
-            <li class="ddm-li">удалить</li>
+            <li class="ddm-li" @click="show_edit_form()">редактировать</li>
+            <li class="ddm-li" @click="show_done_form()">завершить</li>
+            <li class="ddm-li" @click="del_mn()">удалить</li>
         </ul>
     </nav>
 

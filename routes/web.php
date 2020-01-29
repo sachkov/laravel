@@ -49,6 +49,8 @@ Route::post('/ajax/editMN', 'AjaxController@editMN');
 
 Route::post('/ajax/doneMN', 'AjaxController@doneMN');
 
+Route::post('/ajax/deleteMN', 'AjaxController@deleteMN');
+
 Route::post('/ajax/getTable', 'AjaxController@getTable');
 
 Route::post('/ajax/getUsers', 'AjaxController@getUsers');
