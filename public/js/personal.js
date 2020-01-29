@@ -68,7 +68,8 @@ function createGroup(){
         },
         success: function(data){
             try{
-                console.log(data);at
+                console.log(data);
+                location.reload();
             }catch{
                 console.log("createGroup data error!");
             }
