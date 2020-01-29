@@ -24,6 +24,7 @@ class AjaxController extends Controller
             $MN_model->author_id = Auth::user()->id;
             $MN_model->save();
             $MN_model->signed_users()->sync(json_decode($request->input('users')));
+            $MN_model->signed_groups()->sync(json_decode($request->input('groups')));
             
             $out['success'] = $request->input('name');
         } 
@@ -45,6 +46,7 @@ class AjaxController extends Controller
             if($request->input('offset'))
                 $offset = $request->input('offset');
             $prayers = $MN_model::where('author_id', Auth::user()->id)
+                ->whereNull('no_active')
                 ->whereNull('end_date')
                 ->orderBy('updated_at', 'desc')
                 ->offset($offset)
@@ -53,6 +55,7 @@ class AjaxController extends Controller
             $table = [];
             foreach($prayers as $k=>$pr){
                 $r = [];
+                $g = [];
                 $table[$k] = [
                     "id"=>$pr->id,
                     "name"=>$pr->name,
@@ -64,8 +67,12 @@ class AjaxController extends Controller
                 foreach($pr->signed_users as $user){
                     $r[] = ["name"=>$user->name, "id"=>$user->id];
                 }
+                foreach($pr->signed_groups as $group){
+                    $g[] = ["name"=>$group->name, "id"=>$group->id];
+                }
                 $table[$k]["author"] = ["name"=>$pr->author->name, "email"=>$pr->author->email];
                 $table[$k]["users"] = $r;
+                $table[$k]["groups"] = $g;
             }
             $count = $MN_model::where('author_id', Auth::user()->id)
                 ->whereNull('end_date')
@@ -107,6 +114,7 @@ class AjaxController extends Controller
             $MN_model->answer = $request->input('result');
             $MN_model->save();
             $MN_model->signed_users()->sync(json_decode($request->input('users')));
+            $MN_model->signed_groups()->sync(json_decode($request->input('groups')));
             
             $out['success'] = $request->input('id');
         }else{
@@ -147,24 +155,25 @@ class AjaxController extends Controller
         }
         return response()->json( $out );
     }
-    
-    public function getUsersForSelect2(Request $request)
+
+    /*
+    *   "Удаление нужды" - ставим 1 в столбец 'no_active'
+    */
+    public function deleteMN(Request $request)
     {
-        if(Auth::check())
-        {
-            $User_model = new \App\User;
-            $objUsers = $User_model::all();
-            
-            foreach($objUsers as $user){
-                $res[$user->id] = $user->name;
+        if(Auth::check()){
+            if(preg_match('#^\d{1,6}$#', intval($request->input('id')))){
+                $MN_model = \App\Models\MN::find($request->input('id'));
+                $MN_model->no_active = 1;
+                $MN_model->save();
+                $out['result'] = $request->input('id');
+            }else{
+                $out['input error'] = 'Не верный входной параметр id';
             }
-        } 
-        else {
-            $res['error'] = 'У вас нет доступа или комментарий пустой';
+        }else{
+            $out['error'] = 'У вас нет доступа или комментарий пустой';
         }
-
-        return json_encode($res);
-
+        return response()->json( $out );
     }
     
 }

@@ -79,6 +79,6 @@
     <!-- Scripts -->
     <script src="{{ asset('js/app.js') }}"></script>
     <!-- Custom scripts -->
-    <script src="{{ asset('js/prayers.js') }}"></script>
+    <?/*<script src="{{ asset('js/prayers.js') }}"></script>*/?>
 </body>
 </html>

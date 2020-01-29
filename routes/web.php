@@ -30,12 +30,26 @@ Route::get('/personal/invite_friends', 'PersonalController@generateCode')->name(
 
 Route::post('/personal/generate', 'PersonalController@generate');
 
+Route::post('/personal/createGroup', 'PersonalController@createGroup');
+
+Route::post('/personal/getGroups', 'PersonalController@getGroups');
+
+Route::post('/personal/addUser', 'PersonalController@addUser');
+
+Route::post('/personal/leaveGroup', 'PersonalController@leaveGroup');
+
+Route::post('/personal/delGroup', 'PersonalController@delGroup');
+
+Route::post('/personal/changeGroupName', 'PersonalController@changeGroupName');
+
 //Маршрут обработки ajax запросов
 Route::post('/ajax/saveMN', 'AjaxController@saveMN');
 
 Route::post('/ajax/editMN', 'AjaxController@editMN');
 
 Route::post('/ajax/doneMN', 'AjaxController@doneMN');
+
+Route::post('/ajax/deleteMN', 'AjaxController@deleteMN');
 
 Route::post('/ajax/getTable', 'AjaxController@getTable');
 

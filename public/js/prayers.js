@@ -5,10 +5,13 @@ var vm = new Vue({
         add_users_table: [],
         edit: {},           //Объект - редактируемая в данный момент нужда
         done: {},           //Завершаемая в данный момент нужда
-        text: '',
         arUsers: [],
         edit_users_table: [],
         is_thanks: 0,           //Является ли нужда - благодарностью
+        is_groups_table: false,    //Состоит ли пользователь в группах
+        add_groups_table: [],   //Список групп при добавлении мн
+        edit_groups_table: [],  //Список групп при редактировании мн
+        active_index: 0,        //индекс элемента списка, на котором открыли меню
     },
     methods:{
         del: function(a){
@@ -22,43 +25,53 @@ var vm = new Vue({
             temp.description_show = !temp.description_show;
             vm.$set(vm.mainTable, indx, temp);
         },
-        show_edit_form(indx, event){
-            if($(event.target).hasClass("active")){
+        show_edit_form(){
+            if($(".edit-form").is(":visible")){
                 closeEditForm();
             }else{
                 closeDoneForm();//на всякий случай прячем форму завершения
                 
-                $(event.target).addClass("active");
-                $("#container-"+indx).append($(".edit-form"));
+                $("#container-"+vm.active_index).append($(".edit-form"));
                 $(".edit-form").show();
-                vm.edit = vm.mainTable[indx];
-                vm.edit_users_table = vm.mainTable[indx].users;
+                vm.edit = vm.mainTable[vm.active_index];
+                vm.edit_users_table = vm.mainTable[vm.active_index].users;
+                vm.edit_groups_table = vm.mainTable[vm.active_index].groups;
             }
+            vm.active_index = 0;
         },
-        show_done_form(indx, event){
-            if($(event.target).hasClass("active")){
+        show_done_form(){
+            if($(".done-form").is(":visible")){
                 closeDoneForm();
             }else{
                 //Если опубликована благодарность то ее можно только закрыть
-                if(vm.mainTable[indx].is_thanks){
-                    saveDoneForm(vm.mainTable[indx].id);
+                if(vm.mainTable[vm.active_index].is_thanks){
+                    saveDoneForm(vm.mainTable[vm.active_index].id);
                     return true;
                 }
                 closeEditForm();//на всякий случай прячем форму редактирования
                 
-                $(event.target).addClass("active");
-                $("#container-"+indx).append($(".done-form"));
+                $("#container-"+vm.active_index).append($(".done-form"));
                 $(".done-form").show();
-                vm.done = vm.mainTable[indx];
+                vm.done = vm.mainTable[vm.active_index];
             }
-        }
+            vm.active_index = 0;
+        },
+        del_mn(){
+            deleteMN(vm.active_index);
+            vm.active_index = 0;
+        },
+        drop(indx, e){
+            $(e.target).parents(".list-item").append($(".drop-down-menu"));
+            $(".drop-down-menu").show();
+            vm.active_index = indx;
+        },
+        del_gr: function(a){
+            vm.add_groups_table.splice(a,1);
+        },
+        edit_del_gr: function(a){
+            vm.edit_groups_table.splice(a,1);
+        },
     },
-    /*watch: {
-
-    },*/
-    /*computed: {
-
-    }*/
 });
 
 var arUsers = {}; //Список всех пользователей
@@ -73,9 +86,22 @@ $( document ).ready(function(){
             getTable();//Получение основной таблицы молитвенных нужд
             
             getUsers();//Получение списка пользователей для "поделится"
+
+            getGroups();//Получение списка групп для "поделится"
         }
     }
 
+    //Нажатие на любое место на странице
+    $('body').on("click", function(e){
+        //..Закрывает меню списка
+        if( !$(".mn-btn").is(e.target)
+            && 
+            $(".mn-btn").has(e.target).length === 0
+        ){
+            $(".drop-down-menu").hide();
+            vm.active_index = 0;
+        }
+    });
     //Нажатие на "Добавить"
     $("#btn-add-mn").on("click",function(){
         $(this).parent().hide();
@@ -94,6 +120,7 @@ $( document ).ready(function(){
         $("#textarea-descr").val("");
         $("#input-user").val("");
         vm.add_users_table = [];
+        vm.add_groups_table = [];
     });
     
     //Нажатие на "Сохранить" (Редактирование МН)
@@ -169,6 +196,7 @@ function getUsers(){
             for(x in data){
                 arUsers.push({label: data[x], value:x});
             }
+            console.log(arUsers);
             $("#input-user").autocomplete({
                 minLength: 1,
                 source: arUsers,
@@ -207,9 +235,13 @@ function saveMN(){
         });
         return false;
     }
-    var res = [];
+    let res = [];
+    let resG = [];
     for(i in vm.add_users_table){
         res.push(vm.add_users_table[i].value);
+    }
+    for(i in vm.add_groups_table){
+        resG.push(vm.add_groups_table[i].value);
     }
     //отправка ajax
     $.ajax({
@@ -223,7 +255,8 @@ function saveMN(){
             _token: $('#x_token').val(),
             name: name,
             text: $("#textarea-descr").val(),
-            users: JSON.stringify(res)
+            users: JSON.stringify(res),
+            groups: JSON.stringify(resG),
         },
         success: function(data){
             $("#create-form").hide();
@@ -241,18 +274,16 @@ function closeEditForm(){
     $("#descr-edit").val("");
     $("#result-edit").val("");
     vm.edit_users_table = [];
+    vm.edit_groups_table = [];
     $(".mn-act.active").removeClass("active");
     $(".edit-form").hide();
-    //$("#container-"+MNeditID).hide();
-    //MNeditID = 0;
 }
 //Закрытие формы завершения
 function closeDoneForm(){
     vm.edit_users_table = [];
+    vm.edit_groups_table = [];
     $(".mn-act.active").removeClass("active");
     $(".done-form").hide();
-    //$("#container-"+MNeditID).hide();
-    //MNeditID = 0;
 }
 /*
  * Завершение публикации молитвы с возможностью добавить результат
@@ -307,7 +338,8 @@ function saveDoneForm(id = 0){
 
 function editMN(){
     // Находим массив ID пользователи, с которыми поделились молитвой
-    var res = [];
+    let resU = [];
+    let resG = [];
     //var name = $("#name-edit").val();
     var name = vm.edit.name;
     if(!name || name.length < 3){
@@ -319,7 +351,10 @@ function editMN(){
     }
     //var description = $("#descr-edit").val();
     for(i in vm.edit_users_table){
-        res.push(vm.edit_users_table[i].id);
+        resU.push(vm.edit_users_table[i].id);
+    }
+    for(i in vm.edit_groups_table){
+        resG.push(vm.edit_groups_table[i].id);
     }
     //отправка ajax
     $.ajax({
@@ -337,7 +372,8 @@ function editMN(){
             //text: description,
             text: vm.edit.description,
             result: vm.edit.answer,
-            users: JSON.stringify(res)
+            users: JSON.stringify(resU),
+            groups: JSON.stringify(resG),
         },
         success: function(data){
             //Изменение значений в таблице и закрытие формы редактирования
@@ -350,7 +386,28 @@ function editMN(){
         }
     });
 }
-
+/*
+*   Удалить (скрыть) нужду
+*/
+function deleteMN(indx){
+    $.ajax({
+        type: "POST",
+        url: "/ajax/deleteMN",
+        dataType: "json",
+        data: {
+            _token: $('#x_token').val(),
+            id: vm.mainTable[indx].id,
+        },
+        success: function(data){
+            //Удалить нужду из таблицы
+            if(data.result == vm.mainTable[indx].id)
+                vm.mainTable.splice(indx,1);
+        },
+        error: function() {
+            console.log("deleteMN error");
+        }
+    });
+}
 /*
  * Загрузка дополнительных нужд
  */
@@ -358,3 +415,78 @@ function getMorePrayers(){
     var offset = vm.mainTable.length;
     getTable(offset);
 }
+
+///////Функционал групп ////////
+/*
+    Получение всех групп
+*/
+function getGroups(){
+    $.ajax({
+        type: "POST",
+        url: "/personal/getGroups",
+        dataType: "json",
+        data: {
+            _token: $('#x_token').val()
+        },
+        success: function(data){
+            //try{
+                fillAutocomplite(data.groups);
+            //}catch{
+                //console.log("getGroups data error!");
+            //}
+        },
+        error: function(data) {
+            console.log("getGroups error");
+            console.log(data);
+        }
+    });
+}
+/*
+*   Наполнение автокомплита для поиска существующих групп
+*/
+function fillAutocomplite(groups){
+    let table = [];
+    for(x in groups){
+        if(groups[x].is_member){
+            table.push({
+                label: groups[x].name,
+                value: groups[x].id
+            });
+        }
+    }
+    
+    vm.is_groups_table = table.length > 0;
+    $('#input-group').autocomplete({
+        minLength: 1,
+        source: table,
+        select: function( event, ui ) {
+            vm.add_groups_table.push(ui.item);
+            return false;
+        },
+        change: function( event, ui ) {
+            $("#input-group").val("");
+        }
+    });
+    $('#input-group').addClass("test");
+    console.log(table);
+    $('#groups-edit').autocomplete({
+        minLength: 1,
+        source: table,
+        select: function( event, ui ) {
+            vm.edit_groups_table.push({
+                name: ui.item.label, 
+                id: parseInt(ui.item.value,10)
+            });
+            return false;
+        },
+        change: function( event, ui ) {
+            $("#groups-edit").val("");
+        }
+    });
+}
+/*
+function drop(btn, indx){
+    $(btn).parents(".list-item").append($(".drop-down-menu"));
+    $(".drop-down-menu").show();
+    vm.active_index = indx;
+}*/
