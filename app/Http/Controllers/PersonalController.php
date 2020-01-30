@@ -72,7 +72,7 @@ class PersonalController extends Controller
     {
         $WelcomeCodes = new \App\Models\WelcomeCodes;
         do{
-            $code = rand(1, 99999);
+            $code = rand(1, 32700);
             $codes = $WelcomeCodes::where([
                 ["code", $code],
                 ["created_at", "<", date("Y-m-d", (time() - 5*24*60*60))]
