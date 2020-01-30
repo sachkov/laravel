@@ -28,6 +28,8 @@ Route::get('/personal/prayers_end', 'PersonalController@prayersEnd')->name('pray
 
 Route::get('/personal/invite_friends', 'PersonalController@generateCode')->name('generateCode');
 
+Route::get('/personal/about', 'PersonalController@about')->name('about');
+
 Route::post('/personal/generate', 'PersonalController@generate');
 
 Route::post('/personal/createGroup', 'PersonalController@createGroup');

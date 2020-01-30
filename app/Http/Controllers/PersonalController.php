@@ -291,4 +291,12 @@ class PersonalController extends Controller
         }
         return $arGroups;
     }
+
+    /**
+     * Страница о сайте
+     */
+    public function about()
+    {
+        return view('personal.about');
+    }
 }

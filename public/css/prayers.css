@@ -315,6 +315,7 @@
     padding: 15px 0;
     flex-wrap: wrap;
     width: calc(100% - 380px);
+    z-index: 1000;
 }
 .header-first-line .enter_link .list{
     line-height: 1.5;

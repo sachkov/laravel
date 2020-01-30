@@ -19,6 +19,11 @@
                 <a href="{{route('personal')}}">Личный кабинет</a>
             </li>
             @endif
+            @if(Route::currentRouteName() != "about")
+            <li class="list-group-item">
+                <a href="{{route('about')}}">О сайте</a>
+            </li>
+            @endif
         </ul>
         <div class="p_content">
             @yield('page_content')
