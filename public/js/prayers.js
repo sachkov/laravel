@@ -57,7 +57,7 @@ var vm = new Vue({
             vm.active_index = 0;
         },
         del_mn(){
-            deleteMN(vm.active_index);
+            del_popap(vm.active_index);
             vm.active_index = 0;
         },
         drop(indx, e){
@@ -490,3 +490,23 @@ function drop(btn, indx){
     $(".drop-down-menu").show();
     vm.active_index = indx;
 }*/
+
+/*
+ * Попап с подтверждением удаления
+ */
+function del_popap(id){
+    Swal.fire({
+        title: 'Подтвердите удаление',
+        text: 'Восстановление невозможно!',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'ДА, удалить',
+        cancelButtonText: 'Отмена'
+    }).then((result) => {
+        if (result.value) {
+            deleteMN(id);
+        }
+    })
+}

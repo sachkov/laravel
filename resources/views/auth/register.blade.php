@@ -82,11 +82,16 @@
                             </div>
                         </div>
                     </form>
+                    <br>
+                    <p>
+                    Если у Вас возникли трудности с регистрацией на сайте,
+                    Вы можете сообщить о этом по адресу <a href="mailto:sachkov@live.com">sachkov@live.com</a>
+                    </p>
                 </div>
             </div>
         </div>
     </div>
 </div>
-<pre><?print_r($errors)?></pre>
+<pre><?//print_r($errors)?></pre>
 
 @endsection
