@@ -84,9 +84,9 @@ return [
     |
     */
 
-    'username' => env('probuzhdenie.info@mail.ru'),
+    'username' => env('MAIL_USERNAME'),
 
-    'password' => env('Cherch_001'),
+    'password' => env('MAIL_PASSWORD'),
 
     /*
     |--------------------------------------------------------------------------
