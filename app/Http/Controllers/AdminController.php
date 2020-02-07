@@ -31,7 +31,7 @@ class AdminController extends Controller
         $User = new \App\User;
         $user = $User::find(12);
         Mail::send('test_email', ["user"=>$user], function ($message) {
-            $message->from('us@example.com', 'Laravel');
+            $message->from('probuzhdenie.info@mail.ru', 'Пробуждение');
           
             $message->to(Auth::user()->email, Auth::user()->name)->subject('Your Reminder!');
           });
