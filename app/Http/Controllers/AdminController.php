@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Auth;
 
 class AdminController extends Controller
@@ -24,9 +25,16 @@ class AdminController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         $tables = $this->getTableNames();
+        $User = new App\User;
+        $user = $User::find(12);
+        Mail::send('test_email', $user, function ($message) {
+            $message->from('us@example.com', 'Laravel');
+          
+            $message->to(Auth::user()->email, Auth::user()->name)->subject('Your Reminder!');
+          });
         
         return view('admin', ["tables"=>$tables]);
         
