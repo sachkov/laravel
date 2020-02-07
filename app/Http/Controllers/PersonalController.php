@@ -11,7 +11,7 @@ use App\Models\Group;
 class PersonalController extends Controller
 {
     /**
-     * Create a new controller instance.
+     * Главная страница раздела "Личный кабинет".
      *
      * @return void
      */
