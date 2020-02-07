@@ -473,8 +473,14 @@ footer .footer .contacts{
     .header-first-line{justify-content: space-between;}
     .header-logo{ width: 250px; height: 50px;}
     .header-logo div{padding-bottom: 2px;}
-    .header-logo .name{font-size: 26px;}
-    .header-logo .description{font-size: 10px;}
+    .header-logo .name{
+        font-size: 26px;
+        color: white;
+    }
+    .header-logo .description{
+        font-size: 10px;
+        color: white;
+    }
     .header-first-line nav{display: none;}
     .header-first-line .enter_link{
         width: auto;

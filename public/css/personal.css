@@ -30,8 +30,11 @@
     border-radius: 0.25rem;
     transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
-
-.users-groups button.btn.act{
+.users-groups button.personal-btn.disable{
+    background-color: gray;
+    border-color: gray;
+}
+.users-groups button.personal-btn.disable.act{
     background-color: #007bff;
     border-color: #007bff;
 }
