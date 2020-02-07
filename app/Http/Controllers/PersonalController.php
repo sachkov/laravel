@@ -147,6 +147,7 @@ class PersonalController extends Controller
                     ])
                 ->count();
             //Добавляем если пользователя нет в группе
+            $id = 0;
             if(!$count){
                 $id = DB::table('user_group')->insertGetId(
                     [   
