@@ -196,9 +196,8 @@ function addUser(){
             for(x in allGroups)
                 if(allGroups[x].id == selected_group_id)
                     break;
-            if(data.error != undefined)
+            if(data.error == undefined)
                 vm.group_table.push(allGroups[x]);
-            else console.log(data);
             $("#come-in-group").removeClass("act");
             $("#select-group").val("");
         },
