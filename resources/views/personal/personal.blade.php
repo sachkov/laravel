@@ -42,12 +42,12 @@
             </div>
         </div>
 
-        <h4 class="my_groups">Поиск существующей группы</h4>
+        <h4 class="my_groups">Поиск группы</h4>
         <div class="form-group">
             <input type="text" class="form-control" id="select-group" 
                 placeholder="Начинайте вводить название группы">
         </div>
-        <button class="personal-btn" id="come-in-group">
+        <button class="personal-btn disable" id="come-in-group">
             <span class="d-screen">Присоединится</span>
             <span class="d-mobile">&nbsp;</span>
         </button>

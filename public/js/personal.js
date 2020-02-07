@@ -197,6 +197,8 @@ function addUser(){
                 if(allGroups[x].id == selected_group_id)
                     break;
             vm.group_table.push(allGroups[x]);
+            $("#come-in-group").removeClass("act");
+            $("#select-group").val("");
         },
         function(){}
     );

@@ -139,12 +139,22 @@ class PersonalController extends Controller
                 'group' => 'required|numeric|max:1000',
               ]);
 
-            $id = DB::table('user_group')->insertGetId(
-                [   
-                    'user_id' => Auth::user()->id, 
-                    'group_id' => $request->input('group')
-                ]
-            );
+            $count = DB::table('user_group')
+                ->where(
+                    [
+                        'group_id' => $request->input('group'),
+                        'user_id' => Auth::user()->id
+                    ])
+                ->count();
+            //Добавляем если пользователя нет в группе
+            if(!$count){
+                $id = DB::table('user_group')->insertGetId(
+                    [   
+                        'user_id' => Auth::user()->id, 
+                        'group_id' => $request->input('group')
+                    ]
+                );
+            }
             if($id) $out['success'] = $id;
             else $out['error'] = 'ошибка вставки в таблицу';
         } 
@@ -164,7 +174,10 @@ class PersonalController extends Controller
             $this->validate($request, [
                 'group' => 'required|numeric|max:1000',
               ]);
-
+            
+            $count = DB::table('user_group')
+                ->where('group_id', $request->input('group'))
+                ->count();
             DB::table('user_group')
                 ->where(
                 [   
@@ -172,7 +185,17 @@ class PersonalController extends Controller
                     ['group_id', '=', $request->input('group')]
                 ])
                 ->delete();
-            $out['success'] = 'Удаление завершено';
+            $out['success'] = 'Пользователь вышел из группы';
+            //Удаляем группу если из нее вышел последний чел
+            //(т.к. тогда она не ищется через getAllGroups)
+            if($count <= 1){
+                DB::table('groups')
+                    ->where('id', $request->input('group'))
+                    ->delete();
+                $out['success'] = 'Последний пользователь вышел из группы. 
+                    И группа удалена.';
+            }
+            
         }else{
             $out['error'] = 'У вас нет доступа';
         }
