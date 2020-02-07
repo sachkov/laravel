@@ -25,16 +25,9 @@ class AdminController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function index()
     {
         $tables = $this->getTableNames();
-        $User = new \App\User;
-        $user = $User::find(12);
-        Mail::send('test_email', ["user"=>$user], function ($message) {
-            $message->from('probuzhdenie.info@mail.ru', 'Пробуждение');
-          
-            $message->to(Auth::user()->email, Auth::user()->name)->subject('Your Reminder!');
-          });
         
         return view('admin', ["tables"=>$tables]);
         
@@ -49,7 +42,7 @@ class AdminController extends Controller
         $offset = $request->input('offset')?$request->input('offset'):0;
         $table = DB::table($name)
             ->offset($offset)
-            ->take(25)
+            ->take(50)
             ->get();
         $count = DB::table($name)->count();
         return ["table"=>$table, "count"=>$count];
@@ -77,6 +70,23 @@ class AdminController extends Controller
             $ar2[$table->$name] = DB::table($table->$name)->count();
         }
         return $ar2;
+    }
+
+    /*
+    *   Пример отправки почты (from должно быть только от @mail.ru)
+    */
+    public function sendEmail(Request $request)
+    {
+        $User = new \App\User;
+        $user = $User::find(12);
+        Mail::send('test_email', ["user"=>$user], function ($message) {
+            $message->from('probuzhdenie.info@mail.ru', 'Пробуждение');
+          
+            $message->to(Auth::user()->email, Auth::user()->name)->subject('Your Reminder!');
+          });
+        
+        return view('admin', ["tables"=>$tables]);
+        
     }
 
 }
