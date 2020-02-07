@@ -261,6 +261,10 @@ function saveMN(){
         success: function(data){
             $("#create-form").hide();
             $("#btn-add-mn").parent().show();
+            $("#input-name").val("");
+            $("#textarea-descr").val("");
+            vm.add_users_table = [];
+            vm.add_groups_table = [];
             getTable();
         },
         error: function() {
