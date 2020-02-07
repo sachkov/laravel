@@ -28,9 +28,9 @@ class AdminController extends Controller
     public function index(Request $request)
     {
         $tables = $this->getTableNames();
-        $User = new App\User;
+        $User = new \App\User;
         $user = $User::find(12);
-        Mail::send('test_email', $user, function ($message) {
+        Mail::send('test_email', ["user"=>$user], function ($message) {
             $message->from('us@example.com', 'Laravel');
           
             $message->to(Auth::user()->email, Auth::user()->name)->subject('Your Reminder!');
