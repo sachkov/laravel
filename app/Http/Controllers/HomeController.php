@@ -34,16 +34,14 @@ class HomeController extends Controller
      */
     public function prayersList()
     {
-        //DB::enableQueryLog();
+        //DB::enableQueryLog(); //начать запись в лог
         $MN_model = new \App\Models\MN;
         $MN = $MN_model
             ->distinct()
             ->leftJoin('mn_user__rs', 'mn.id', '=', 'mn_user__rs.mn_id')
             ->leftJoin('mn_group', 'mn.id', '=', 'mn_group.mn_id')
-            //->join('users', 'mn.author_id', '=', 'users.id')
-            //->select('mn.*', 'users.name as author_name')
             ->select('mn.*')
-            ->where('author_id', '<>', Auth::user()->id)
+            //->where('author_id', '<>', Auth::user()->id)
             ->whereNull('end_date')
             ->whereNull('no_active')
             ->where(function ($query) {
@@ -57,15 +55,20 @@ class HomeController extends Controller
                     
                     if(count($groups))
                         $query->whereIn('mn_group.group_id', $groups)
-                            ->orWhere('mn_user__rs.user_id', '=', Auth::user()->id);
+                            ->orWhere([
+                                    ['mn_user__rs.user_id', '=', Auth::user()->id],
+                                    ['author_id', '<>', Auth::user()->id]
+                                ]);
                     else
-                        $query->where('mn_user__rs.user_id', '=', Auth::user()->id);
+                        $query->where([
+                                ['mn_user__rs.user_id', '=', Auth::user()->id],
+                                ['author_id', '<>', Auth::user()->id]
+                            ]);
                 })
-            //->where('mn_user__rs.user_id', '=', Auth::user()->id)
             ->orderBy('mn.updated_at', 'desc')
             ->take(30)
             ->get();
-            //dd(DB::getQueryLog());
+            //dd(DB::getQueryLog());  //вывод лога запроса
         return view('prayersList', ["arMN"=>$MN]);
     }
     

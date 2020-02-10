@@ -472,7 +472,7 @@ function fillAutocomplite(groups){
         }
     });
     $('#input-group').addClass("test");
-    console.log(table);
+    //console.log(table);
     $('#groups-edit').autocomplete({
         minLength: 1,
         source: table,
