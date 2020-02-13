@@ -11,7 +11,23 @@ var vm = new Vue({
 });
 
 $( document ).ready(function(){
-    
+    globalAjax(
+        '/ajax/getPrayersList',
+        {
+            last_date: '',
+            group_id: 0
+        },
+        function(data){
+            try{
+                console.log("getPrayersList received");
+                console.log(data);
+            }catch(e){
+                console.log(e);
+            }
+            
+        },
+        function(){}
+    );
 });
 
 /*

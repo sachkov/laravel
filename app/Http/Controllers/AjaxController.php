@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
 use Auth;
 
 class AjaxController extends Controller
@@ -189,7 +190,49 @@ class AjaxController extends Controller
         // 3. Удаляем дубли (из пользователей)
         // 4. Получаем МН из массива полученных в п.1 и 2 ИД.
         // П.1 и п.2 получаем с сортировкой по дате обновления, и где 
-        // дата обновления >= входная дата.
-        // !! При слиянии массивов на клиенте удалять нужды с одинаковыми ИД
+        // дата обновления > входная дата.
+        // Если в обоих массивах по 30 элементов то сравниваем последние даты
+        // Финальная дата - наибольшая из 2х последних
+        // Если оба массива < 30 то финальная дата - наименьшая из всех
+        // Если только 1 массив = 30 элементам то финальная дата - последняя в этом массиве
+        // В результирующий массив должны попасть элементы с датами > финальной.
+
+        // Формируем результирующий массив: если в массиве групп есть ИД пользователей,
+        // ИД пользователя удаляем;
+        // Если в массиве групп есть элементы с одинак ИД то объединяем group_id
+
+        // Сортируем массив по 'mn.updated_at'
+
+        // Получаем данные МН для каждого ИД в результирующем массиве
+
+        // Получаем Имена авторов
+        // Получаем Названия групп
+        
+        $groups = [];
+        $gr = DB::table('user_group')
+            ->select("group_id")
+            ->where('user_id', Auth::user()->id)
+            ->get();
+        foreach($gr as $group)
+            $groups[] = $group->group_id;
+
+        $groups_id = DB::table('mn')
+            ->leftJoin('mn_group', 'mn.id', '=', 'mn_group.mn_id')
+            ->select('mn.id','mn.updated_at', 'mn_group.group_id')
+            ->whereIn('mn_group.group_id', $groups)
+            ->take(30)
+            ->orderBy('mn.updated_at', 'desc')
+            ->get();
+        
+        $users = DB::table('mn')
+            ->leftJoin('mn_user__rs', 'mn.id', '=', 'mn_user__rs.mn_id')
+            ->select('mn.id','mn.updated_at')
+            ->where('mn_user__rs.user_id', Auth::user()->id)
+            ->where('mn.author_id', "<>", Auth::user()->id)
+            ->take(30)
+            ->orderBy('mn.updated_at', 'desc')
+            ->get();
+
+            return response()->json( ["groups"=>$groups_id, "users"=>$users] );
     }
 }

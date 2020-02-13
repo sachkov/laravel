@@ -3,6 +3,7 @@
 @section('title', 'Молитвы')
 
 @section('content')
+<input type="hidden" id="x_token" value="{{ csrf_token() }}">
 <h3>Общие молитвы</h3>
 <div id="PE" class="prayers-list">
     
