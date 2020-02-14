@@ -209,6 +209,8 @@ class AjaxController extends Controller
         // Получаем Названия групп
         
         $groups = [];
+        $num = 30;  //сколько записей получаем за раз
+
         $gr = DB::table('user_group')
             ->select("group_id")
             ->where('user_id', Auth::user()->id)
@@ -216,23 +218,84 @@ class AjaxController extends Controller
         foreach($gr as $group)
             $groups[] = $group->group_id;
 
+// !!!!!!! Добавить where('mn.updated_at', '>', $last_date) !!!!!!!!
+
         $groups_id = DB::table('mn')
             ->leftJoin('mn_group', 'mn.id', '=', 'mn_group.mn_id')
-            ->select('mn.id','mn.updated_at', 'mn_group.group_id')
+            //->select('mn.id','mn.updated_at', 'mn_group.group_id')
+            ->select('mn.id', 'mn_group.group_id')
             ->whereIn('mn_group.group_id', $groups)
-            ->take(30)
+            ->take($num)
             ->orderBy('mn.updated_at', 'desc')
-            ->get();
+            ->get()->toArray();
         
         $users = DB::table('mn')
             ->leftJoin('mn_user__rs', 'mn.id', '=', 'mn_user__rs.mn_id')
-            ->select('mn.id','mn.updated_at')
+            //->select('mn.id','mn.updated_at')
+            ->select('mn.id')
             ->where('mn_user__rs.user_id', Auth::user()->id)
             ->where('mn.author_id', "<>", Auth::user()->id)
-            ->take(30)
+            ->take($num)
             ->orderBy('mn.updated_at', 'desc')
-            ->get();
+            ->get()->toArray();
+        /*
+        $group_date = $user_date = '';
+        $groups_count = count($groups_id);
+        $users_count = count($users);
 
-            return response()->json( ["groups"=>$groups_id, "users"=>$users] );
+        if($groups_count || $users_count){
+            if($groups_count < $num && $users_count < $num){
+                if(!$groups_count)
+                    $last_date = strtotime($users[$users_count - 1]->updated_at);
+                elseif(!$users_count)
+                    $last_date = strtotime($groups_id[$groups_count - 1]->updated_at);
+                elseif( 
+                    strtotime($users[$users_count - 1]->updated_at) > 
+                    strtotime($groups_id[$groups_count - 1]->updated_at)
+                ) $last_date = strtotime($users[$users_count - 1]->updated_at);
+                else $last_date = strtotime($groups_id[$groups_count - 1]->updated_at);
+
+            }elseif($groups_count == $num && $users_count == $num){
+                if( 
+                    strtotime($users[$users_count - 1]->updated_at) > 
+                    strtotime($groups_id[$groups_count - 1]->updated_at)
+                ) $last_date = strtotime($users[$users_count - 1]->updated_at);
+                else $last_date = strtotime($groups_id[$groups_count - 1]->updated_at);
+            }else{
+                if($groups_count == $num)
+                    $last_date = strtotime($groups_id[$groups_count - 1]->updated_at);
+                elseif($users_count == $num)
+                $last_date = strtotime($users[$users_count - 1]->updated_at);
+            }
+        }else{
+            $error = "не найдены значения";
+        }*/
+
+        foreach($groups_id as $mn){
+            //$arG[$mn->id]["date"] = $mn->updated_at;
+            $arG[$mn->id][] = $mn->group_id;
+        }
+
+        foreach($users as $umn){
+            if(!array_key_exists($umn->id, $arG))
+                $arG[$umn->id] = [];
+                //$arG[$umn->id]["date"] = $umn->updated_at;
+        }
+
+        $MN = DB::table('mn')
+            ->whereIn('id', array_keys($arG))
+            ->orderBy('updated_at', 'desc')
+            ->get();
+        
+
+
+            return response()->json( [
+                "groups"=>$groups_id, 
+                "users"=>$users,
+                "last_date"=>$last_date,
+                "ar"=>$arG,
+                "MN"=>$MN
+            ]);
     }
+
 }
