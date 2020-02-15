@@ -21,6 +21,7 @@ $( document ).ready(function(){
             try{
                 console.log("getPrayersList received");
                 console.log(data);
+                console.table(data.MN);
             }catch(e){
                 console.log(e);
             }
