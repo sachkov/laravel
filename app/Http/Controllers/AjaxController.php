@@ -201,7 +201,7 @@ class AjaxController extends Controller
 
         $groups_id = DB::table('mn')
             ->leftJoin('mn_group', 'mn.id', '=', 'mn_group.mn_id')
-            ->select('mn.id', 'mn_group.group_id', 'author_id')
+            ->select('mn.id', 'mn_group.group_id', 'mn.author_id')
             ->whereIn('mn_group.group_id', array_keys($groups))
             ->whereNull('no_active')
             ->whereNull('end_date')
@@ -211,7 +211,7 @@ class AjaxController extends Controller
         
         $users = DB::table('mn')
             ->leftJoin('mn_user__rs', 'mn.id', '=', 'mn_user__rs.mn_id')
-            ->select('mn.id', 'author_id')
+            ->select('mn.id', 'mn.author_id')
             ->where('mn_user__rs.user_id', Auth::user()->id)
             ->where('mn.author_id', "<>", Auth::user()->id)
             ->whereNull('no_active')
@@ -226,14 +226,16 @@ class AjaxController extends Controller
         }
 
         foreach($users as $umn){
-            if(!array_key_exists($umn->id, $arG))
+            if(!array_key_exists($umn->id, $arG)){
                 $arG[$umn->id] = [];
-                $authors[] = $mn->author_id;
+                $authors[] = $umn->author_id;
+            }
         }
         $arAuthors = DB::table("users")
             ->select("id", "name")
             ->whereIn("id", $authors)
-            ->get();
+            ->get()->keyBy("id");
+
 
         $MN = DB::table('mn')
             ->select("id", "name", "description", "author_id", "answer", 
@@ -244,8 +246,8 @@ class AjaxController extends Controller
 
         return response()->json( [
             "groups"=>$groups, 
-            "users"=>$arAuthors,
-            "ar"=>$arG,
+            "authors"=>$arAuthors,
+            "mn_groups"=>$arG,
             "MN"=>$MN
         ]);
     }

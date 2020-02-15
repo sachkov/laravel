@@ -1,7 +1,10 @@
 var vm = new Vue({
     el: '#PE',
     data: {
-        mainTable: [],
+        arMN: [],
+        groups: [],
+        group_name: [],
+        authors: [],
     },
     methods:{
         edit_del_gr: function(a){
@@ -19,9 +22,12 @@ $( document ).ready(function(){
         },
         function(data){
             try{
-                console.log("getPrayersList received");
-                console.log(data);
-                console.table(data.MN);
+                //console.log(data);
+                //console.table(data.MN);
+                vm.arMN = data.MN;
+                vm.mn_groups = data.mn_groups;
+                vm.group_name = data.groups;
+                vm.authors = data.authors;
             }catch(e){
                 console.log(e);
             }
