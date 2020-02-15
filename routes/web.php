@@ -25,7 +25,6 @@ Route::get('/prayerslist', 'HomeController@prayersList')->name('list');
 Route::get('/personal', 'PersonalController@index')->name('personal');
 
 Route::get('/personal/prayers_end', 'PersonalController@prayersEnd')->name('prayersEnd');
-Route::get('/personal/prayers_end2', 'AdminController@prayersEnd2')->name('prayersEnd2');
 
 Route::get('/personal/invite_friends', 'PersonalController@generateCode')->name('generateCode');
 

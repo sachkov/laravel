@@ -89,9 +89,4 @@ class AdminController extends Controller
         
     }
 
-    public function prayersEnd2(Request $request)
-    {
-        return view('prayersList2');
-    }
-
 }
