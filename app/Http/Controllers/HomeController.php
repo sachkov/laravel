@@ -35,6 +35,7 @@ class HomeController extends Controller
     public function prayersList()
     {
         //DB::enableQueryLog(); //начать запись в лог
+        /*
         $MN_model = new \App\Models\MN;
         $MN = $MN_model
             ->distinct()
@@ -68,8 +69,10 @@ class HomeController extends Controller
             ->orderBy('mn.updated_at', 'desc')
             ->take(30)
             ->get();
+            */
             //dd(DB::getQueryLog());  //вывод лога запроса
-        return view('prayersList', ["arMN"=>$MN]);
+        //return view('prayersList', ["arMN"=>$MN]);
+        return view('prayersList');
     }
     
 }

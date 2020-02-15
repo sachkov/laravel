@@ -57,6 +57,8 @@ Route::post('/ajax/getTable', 'AjaxController@getTable');
 
 Route::post('/ajax/getUsers', 'AjaxController@getUsers');
 
+Route::post('/ajax/getPrayersList', 'AjaxController@getPrayersList');
+
 //Маршруты к административным страницам
 Route::get('/admin', 'AdminController@index');
 

@@ -1,0 +1,28 @@
+.prayers-list .prayes{
+    position: relative;
+}
+.prayers-list .groups-line{
+    position: absolute;
+    text-align: end;
+    font-size: 0.8rem;
+    top: 0;
+    right: 3px;
+    max-height: 19px;
+    overflow: hidden;
+}
+.groups-line + .timeText{
+    margin-top: 7px;
+}
+.groups-li{
+    padding: 0 3px;
+    margin-right: 7px;
+    border-radius: 3px;
+    max-width: 70px;
+    overflow: hidden;
+}
+.c1{background-color: #6699FF;}
+.c2{background-color: #99FF99;}
+.c3{background-color: #CCFF99;}
+.c4{background-color: #CCCC66;}
+.c5{background-color: #FF99CC;}
+.c6{background-color: #FFCC66;}
