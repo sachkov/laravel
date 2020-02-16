@@ -89,4 +89,12 @@ class AdminController extends Controller
         
     }
 
+    public function import()
+    {
+        $info = phpinfo(1);
+        
+        return view('import', ["info"=>$info]);
+        
+    }
+
 }

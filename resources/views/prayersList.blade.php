@@ -12,7 +12,7 @@
             <span v-for="gr in mn_groups[mn.id]"
                 class="groups-li"
                 :class="['c'+gr]">
-                @{{group_name[gr].substr(0,15)+'..'}}
+                @{{group_name[gr]}}
             </span>
         </div>
         <div class="timeText">

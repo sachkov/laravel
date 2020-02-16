@@ -193,8 +193,13 @@ class AjaxController extends Controller
             ->select("user_group.group_id", "groups.name")
             ->where('user_id', Auth::user()->id)
             ->get();
-        foreach($gr as $group)
-            $groups[$group->group_id] = $group->name;
+        foreach($gr as $group){
+            if(strlen($group->name) > 15)
+                $str = substr($group->name, 0, 15)."..";
+            else
+                $str = $group->name;
+            $groups[$group->group_id] = $str;
+        }
 
 // !!!!!!! Добавить where('mn.updated_at', '>', $last_date) !!!!!!!!
 // !!!!!!! ->where("updated_at", ">", "2020-02-01 00:00:00") !!!!!!!
