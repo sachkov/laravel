@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Reader\IReadFilter;
 use Mail;
 use Auth;
 
@@ -42,7 +44,7 @@ class AdminController extends Controller
         $offset = $request->input('offset')?$request->input('offset'):0;
         $table = DB::table($name)
             ->offset($offset)
-            ->take(50)
+            ->take(100)
             ->get();
         $count = DB::table($name)->count();
         return ["table"=>$table, "count"=>$count];
@@ -91,10 +93,70 @@ class AdminController extends Controller
 
     public function import()
     {
-        $info = phpinfo(1);
+        //phpinfo();
         
+        //$info = file_exists("../storage/app/list.xlsx");
+
+        $inputFileName = "../storage/app/list.xlsx";
+        // Чтение всего листа (вместе с пустыми ячейками)
+        //$spreadsheet = IOFactory::load($inputFileName);
+        //$sheetData = $spreadsheet->getActiveSheet()->toArray(null, true, true, true);
+
+
+        $filterSubset = new MyReadFilter(2, 30, range('A', 'C'));
+
+        $reader = IOFactory::createReader("Xlsx");
+        $reader->setReadFilter($filterSubset);
+        $spreadsheet = $reader->load($inputFileName);
+
+        $sheetData = $spreadsheet->getActiveSheet()->toArray(null, true, true, true);
+
+        
+        foreach($sheetData as $k=>$row){
+            if($k != 1){
+                //Внимательнее с датой!!!
+                //$info[] = date("Y-m-d H:i:s" ,strtotime($row["A"]));
+                //$info[] = $row["A"];
+            $MN_model = new \App\Models\MN;
+            $MN_model->created_at = date("Y-m-d H:i:s" ,strtotime($row["A"]));
+            $MN_model->name = $row["B"];
+            $MN_model->description = $row["C"];
+            $MN_model->author_id = 2;
+            $MN_model->save();
+            $MN_model->signed_groups()->sync(2);
+            }
+        }
+        $info = "yes";
+
         return view('import', ["info"=>$info]);
         
     }
 
+}
+
+class MyReadFilter implements IReadFilter
+{
+    private $startRow = 0;
+
+    private $endRow = 0;
+
+    private $columns = [];
+
+    public function __construct($startRow, $endRow, $columns)
+    {
+        $this->startRow = $startRow;
+        $this->endRow = $endRow;
+        $this->columns = $columns;
+    }
+
+    public function readCell($column, $row, $worksheetName = '')
+    {
+        if ($row >= $this->startRow && $row <= $this->endRow) {
+            if (in_array($column, $this->columns)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }
