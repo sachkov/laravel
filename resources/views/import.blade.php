@@ -8,7 +8,7 @@
 <div>
 
     <pre>
-        <?//print_r($info);?>
+        <?print_r($info);?>
     </pre>
 </div>
 @endsection
