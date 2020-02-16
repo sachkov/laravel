@@ -62,6 +62,8 @@ Route::post('/ajax/getPrayersList', 'AjaxController@getPrayersList');
 //Маршруты к административным страницам
 Route::get('/admin', 'AdminController@index');
 
+Route::get('/admin/import', 'AdminController@import');
+
 Route::post('/admin/getTable', 'AdminController@getTable');
 
 Route::post('/admin/delTableRow', 'AdminController@deleteRowInTable');
