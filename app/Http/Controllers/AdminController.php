@@ -121,9 +121,9 @@ class AdminController extends Controller
             $MN_model->created_at = date("Y-m-d H:i:s" ,strtotime($row["A"]));
             $MN_model->name = $row["B"];
             $MN_model->description = $row["C"];
-            $MN_model->author_id = 2;
+            $MN_model->author_id = 14;
             $MN_model->save();
-            $MN_model->signed_groups()->sync(2);
+            $MN_model->signed_groups()->sync(4);
             }
         }
         $info = "yes";
