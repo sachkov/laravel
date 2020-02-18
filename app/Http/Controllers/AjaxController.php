@@ -183,7 +183,7 @@ class AjaxController extends Controller
         - дата последней нужды (для пагинации)
         - id группы или признак вывода личных нужд
     */
-    public function getPrayersList()
+    public function getPrayersList(Request $request)
     {
         $groups = [];
         $num = 30;  //сколько записей получаем за раз
@@ -248,12 +248,17 @@ class AjaxController extends Controller
             ->whereIn('id', array_keys($arG))
             ->orderBy('updated_at', 'desc')
             ->get();
+        // 
+        $prepMN = $objMN->map(function ($item, $key) {
+            $item->description = mb_convert_encoding($item->description, 'UTF-8', 'UTF-8');
+            return $item;
+        });
 
         return response()->json( [
             "groups"=>$groups, 
             "authors"=>$arAuthors,
             "mn_groups"=>$arG,
-            "MN"=>$objMN,
+            "MN"=>$prepMN,
         ] );
     }
 
