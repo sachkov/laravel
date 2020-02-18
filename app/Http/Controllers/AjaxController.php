@@ -257,8 +257,8 @@ class AjaxController extends Controller
 
         return response()->json( [
             "groups"=>$groups, 
-            "authors"=>$arAuthors,
-            "mn_groups"=>$arG,
+            //"authors"=>$arAuthors,
+            //"mn_groups"=>$arG,
             //"MN"=>$prepMN,
         ] );
     }
