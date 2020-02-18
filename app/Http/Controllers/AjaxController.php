@@ -256,7 +256,7 @@ class AjaxController extends Controller
         });
 
         return json_encode( [
-            //"groups"=>$groups, 
+            "groups"=>$groups, 
             "authors"=>$arAuthors,
             //"mn_groups"=>$arG,
             //"MN"=>$prepMN,
