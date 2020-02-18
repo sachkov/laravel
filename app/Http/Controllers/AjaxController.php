@@ -250,6 +250,7 @@ class AjaxController extends Controller
             ->get();
         // 
         $prepMN = $objMN->map(function ($item, $key) {
+            $item->name = mb_convert_encoding($item->name, 'UTF-8', 'UTF-8');
             $item->description = mb_convert_encoding($item->description, 'UTF-8', 'UTF-8');
             return $item;
         });
@@ -258,7 +259,7 @@ class AjaxController extends Controller
             "groups"=>$groups, 
             "authors"=>$arAuthors,
             "mn_groups"=>$arG,
-            "MN"=>$prepMN,
+            //"MN"=>$prepMN,
         ] );
     }
 
