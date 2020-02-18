@@ -242,7 +242,7 @@ class AjaxController extends Controller
             ->get()->keyBy("id");
 
 
-        $MN = DB::table('mn')
+        $objMN = DB::table('mn')
             ->select("id", "name", "description", "author_id", "answer", 
                     "answer_date","created_at", "updated_at")
             ->whereIn('id', array_keys($arG))
@@ -253,8 +253,8 @@ class AjaxController extends Controller
             "groups"=>$groups, 
             "authors"=>$arAuthors,
             "mn_groups"=>$arG,
-            "MN"=>$MN
-        ]);
+            "MN"=>$objMN,
+        ] );
     }
 
 }
