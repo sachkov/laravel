@@ -186,7 +186,7 @@ class AjaxController extends Controller
     public function getPrayersList(Request $request)
     {
         $groups = [];
-        $num = 30;  //сколько записей получаем за раз
+        $num = 50;  //сколько записей получаем за раз
 
         $gr = DB::table('user_group')
             ->leftJoin("groups", "user_group.group_id", "=", "groups.id")
