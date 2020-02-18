@@ -256,10 +256,10 @@ class AjaxController extends Controller
         });
 
         return json_encode( [
-            "groups"=>$groups, 
-            "authors"=>$arAuthors,
-            "mn_groups"=>$arG,
-            "MN"=>$prepMN,
+            //"groups"=>$groups, 
+            //"authors"=>$arAuthors,
+            //"mn_groups"=>$arG,
+            //"MN"=>$prepMN,
         ] );
     }
 
