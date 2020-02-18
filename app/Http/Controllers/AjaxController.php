@@ -195,7 +195,7 @@ class AjaxController extends Controller
             ->get();
         foreach($gr as $group){
             if(strlen($group->name) > 15)
-                $str = substr($group->name, 0, 15)."..";
+                $str = mb_substr($group->name, 0, 15)."..";
             else
                 $str = $group->name;
             $groups[$group->group_id] = $str;
