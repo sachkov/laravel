@@ -183,7 +183,7 @@ class AjaxController extends Controller
         - дата последней нужды (для пагинации)
         - id группы или признак вывода личных нужд
     */
-    public function getPrayersList(Request $request)
+    public function getPrayersList()
     {
         $groups = [];
         $num = 30;  //сколько записей получаем за раз
