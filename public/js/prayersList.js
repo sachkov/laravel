@@ -22,7 +22,7 @@ $( document ).ready(function(){
         },
         function(data){
             try{
-                //console.log(data);
+                console.log(data);
                 //console.table(data.MN);
                 vm.arMN = data.MN;
                 vm.mn_groups = data.mn_groups;
