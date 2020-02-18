@@ -255,11 +255,11 @@ class AjaxController extends Controller
             return $item;
         });
 
-        return response()->json( [
+        return json_encode( [
             "groups"=>$groups, 
-            //"authors"=>$arAuthors,
-            //"mn_groups"=>$arG,
-            //"MN"=>$prepMN,
+            "authors"=>$arAuthors,
+            "mn_groups"=>$arG,
+            "MN"=>$prepMN,
         ] );
     }
 
