@@ -10,7 +10,7 @@
     max-height: 19px;
     overflow: hidden;
 }
-.groups-line + .timeText{
+.groups-line.shown + .timeText{
     margin-top: 7px;
 }
 .groups-li{
@@ -26,3 +26,9 @@
 .c4{background-color: #CCCC66;}
 .c5{background-color: #FF99CC;}
 .c6{background-color: #FFCC66;}
+
+.prayers-list .time-column .time{font-size: 14px;}
+
+@media (max-width: 480px){
+    .prayers-list .time-column .time{font-size: 12px;}
+}
