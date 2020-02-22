@@ -72,6 +72,7 @@ class HomeController extends Controller
             */
             //dd(DB::getQueryLog());  //вывод лога запроса
         //return view('prayersList', ["arMN"=>$MN]);
+
         return view('prayersList');
     }
     

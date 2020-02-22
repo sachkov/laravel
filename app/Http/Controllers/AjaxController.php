@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 use Auth;
 
 class AjaxController extends Controller
@@ -186,8 +187,11 @@ class AjaxController extends Controller
     public function getPrayersList(Request $request)
     {
         $groups = [];
-        $num = 50;  //сколько записей получаем за раз
+        $authors = [];
+        $arG = [];
+        $num = 30;  //сколько записей получаем за раз
 
+        // Получаем группы в которых состоит пользователь
         $gr = DB::table('user_group')
             ->leftJoin("groups", "user_group.group_id", "=", "groups.id")
             ->select("user_group.group_id", "groups.name")
@@ -203,6 +207,14 @@ class AjaxController extends Controller
 
 // !!!!!!! Добавить where('mn.updated_at', '>', $last_date) !!!!!!!!
 // !!!!!!! ->where("updated_at", ">", "2020-02-01 00:00:00") !!!!!!!
+        
+        $updated_at = "2040-01-01 00:00:00";    //1577822400
+        if( $request->input('last_date')
+            &&
+            strtotime($request->input('last_date')) < 2222222222
+        ){
+            $updated_at = date("Y-m-d H:i:s",strtotime($request->input('last_date')));
+        }
 
         $groups_id = DB::table('mn')
             ->leftJoin('mn_group', 'mn.id', '=', 'mn_group.mn_id')
@@ -210,6 +222,7 @@ class AjaxController extends Controller
             ->whereIn('mn_group.group_id', array_keys($groups))
             ->whereNull('no_active')
             ->whereNull('end_date')
+            ->where("mn.updated_at", "<", $updated_at)
             ->take($num)
             ->orderBy('mn.updated_at', 'desc')
             ->get()->toArray();
@@ -221,6 +234,7 @@ class AjaxController extends Controller
             ->where('mn.author_id', "<>", Auth::user()->id)
             ->whereNull('no_active')
             ->whereNull('end_date')
+            ->where("mn.updated_at", "<", $updated_at)
             ->take($num)
             ->orderBy('mn.updated_at', 'desc')
             ->get()->toArray();
@@ -244,14 +258,14 @@ class AjaxController extends Controller
 
         $objMN = DB::table('mn')
             ->select("id", "name", "description", "author_id", "answer", 
-                    "answer_date","created_at", "updated_at")
+                    "answer_date", "updated_at")
             ->whereIn('id', array_keys($arG))
+            ->take($num)
             ->orderBy('updated_at', 'desc')
             ->get();
-        // 
-        $prepMN = $objMN->map(function ($item, $key) {
-            $item->name = mb_convert_encoding($item->name, 'UTF-8', 'UTF-8');
-            $item->description = mb_convert_encoding($item->description, 'UTF-8', 'UTF-8');
+            
+        $objMN2 = $objMN->transform(function ($item, $key) {
+            $item->diff = $this->humanDate($item->updated_at);
             return $item;
         });
 
@@ -259,8 +273,43 @@ class AjaxController extends Controller
             "groups"=>$groups, 
             "authors"=>$arAuthors,
             "mn_groups"=>$arG,
-            "MN"=>$prepMN,
+            "MN"=>$objMN2,
         ] );
     }
 
+    private function humanDate($uDate){
+        $months = [
+            1=>"января",
+            2=>"февраля",
+            3=>"марта",
+            4=>"апреля",
+            5=>"мая",
+            6=>"июня",
+            7=>"июля",
+            8=>"августа",
+            9=>"сентября",
+            10=>"октября",
+            11=>"ноября",
+            12=>"декабря",
+        ];
+        $text = "";
+        $now = Carbon::now();
+        $diff = $now->diffInDays($uDate);
+        $D = Carbon::parse($uDate);
+        if($diff < 1){
+            $text .= "сегодня";
+        }elseif($diff < 2){
+            $text .= "вчера";
+        }elseif($diff < 5){
+            $text .= $diff." дня назад";
+        }elseif($diff < 10){
+            $text .= $diff." дней назад";
+        }elseif($D->year != $now->year){
+            $text .= $D->day." ".$months[$D->month]." ".$D->year ;
+        }else{
+            $text .= $D->day." ".$months[$D->month];
+        }
+        
+        return $text;
+    }
 }

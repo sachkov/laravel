@@ -7,9 +7,9 @@
 <h3>Общие молитвы</h3>
 <div id="PE" class="prayers-list">
     
-    <div class="prayes" v-for="mn in arMN">
-        <div class="groups-line" v-if="mn_groups[mn.id].length">
-            <span v-for="gr in mn_groups[mn.id]"
+    <div class="prayes" v-for="(mn, indx) in MNid" v-bind:key="indx">
+        <div class="groups-line" :class="{shown:groups[mn].length}">
+            <span v-for="gr in groups[mn]"
                 class="groups-li"
                 :class="['c'+gr]">
                 @{{group_name[gr]}}
@@ -17,27 +17,32 @@
         </div>
         <div class="timeText">
             <div class="time-column">
-                <p class="time">@{{ mn.updated_at }}</p>
+                <p class="time">@{{ arMN[mn].diff }}</p>
             </div>
             <div class="text-column">
                 <p class="header">
-                    <span>@{{authors[mn.author_id].name}}</span>
+                    <span>@{{authors[arMN[mn].author_id].name}}</span>
                     <span style="color: green;"
-                        v-if="mn.answer_date && mn.answer">
+                        v-show="arMN[mn].answer_date && arMN[mn].answer">
                         Благодарность
                     </span>
-                    <span>@{{mn.name}}</span>
+                    <span>@{{arMN[mn].name}}</span>
                 </p>
             </div>
         </div>
-        <p class="description">@{{mn.description}}</p>
-        <p class="answer" v-if="mn.answer">
-            @{{mn.answer}}
+        <p class="description">@{{arMN[mn].description}}</p>
+        <p class="answer" v-show="arMN[mn].answer">
+            @{{arMN[mn].answer}}
         </p>
     </div>
 
+    <div id="more_btn" class="btn btn-outline-warning"
+        @click="getMorePrayers(arMN[MNid[MNid.length-1]].updated_at)"
+        >
+        Еще
+    </div>
     <pre>
-        <?//print_r($arMN);?>
+        <?//print_r($gr);?>
     </pre>
 </div>
 @endsection
