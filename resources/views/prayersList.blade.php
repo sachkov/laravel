@@ -7,7 +7,7 @@
 <h3>Общие молитвы</h3>
 <div id="PE" class="prayers-list">
     
-    <div class="prayes" v-for="(mn, indx) in MNid" v-bind:key="indx" v-bind:src="mn">
+    <div class="prayes" v-for="(mn, indx) in MNid" v-bind:key="indx">
         <div class="groups-line" :class="{shown:groups[mn].length}">
             <span v-for="gr in groups[mn]"
                 class="groups-li"
