@@ -88,7 +88,7 @@ let vm = new Vue({
         arGroupNames: [],  //массив имен групп для оприделения изменено ли значение
     },
     methods: {
-        leave: function(group_indx){
+        /*leave: function(group_indx){
             globalAjax(
                 "/personal/leaveGroup",
                 {group: vm.group_table[group_indx].id},
@@ -109,8 +109,8 @@ let vm = new Vue({
                 },
                 ()=>{}
             );
-        },
-        saveName: function(group_indx){
+        },*/
+        /*saveName: function(group_indx){
             vm.arGroupNames[group_indx] = 
                 vm.group_table[group_indx].name;
         },
@@ -131,7 +131,7 @@ let vm = new Vue({
                 );
             }
             
-        },
+        },*/
     }
 });
 
@@ -202,6 +202,68 @@ function addUser(){
             $("#select-group").val("");
         },
         function(){}
+    );
+}
+
+function leave(group_indx){
+    globalAjax(
+        "/personal/leaveGroup",
+        {group: group_indx},
+        function(){
+            location.reload();
+        },
+        ()=>{}
+    );
+}
+
+function changeName(group_indx){
+    if($("#group_name").val() !=
+        $(".info.group_name").html()
+    ){ 
+        globalAjax(
+            "/personal/changeGroupName",
+            {
+                name: $("#group_name").val(),
+                id: group_indx
+            },
+            function(){location.reload();},
+            ()=>{}
+        );
+    }
+}
+
+function admin(group_id, user_id){
+    globalAjax(
+        "/personal/addAdmin",
+        {
+            group_id: group_id,
+            user_id: user_id
+        },
+        function(){location.reload();},
+        ()=>{}
+    );
+}
+
+function del_admin(group_id, user_id){
+    globalAjax(
+        "/personal/delAdmin",
+        {
+            group_id: group_id,
+            user_id: user_id
+        },
+        function(){location.reload();},
+        ()=>{}
+    );
+}
+function remove(group_id, user_id){
+    globalAjax(
+        "/personal/leaveGroup",
+        {
+            group: group_id,
+            user_id: user_id
+        },
+        function(){location.reload();},
+        ()=>{}
     );
 }
 

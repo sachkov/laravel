@@ -6,12 +6,43 @@
 <div id="appV">
     <form id="create-form">
         <input type="hidden" id="x_token" value="{{ csrf_token() }}">
+
         <div class="form-group">
             <label for="input-name">Наименование</label>
             <input type="text" class="form-control" id="input-name" placeholder="Заголовок 'о чем' или 'о ком'">
             <div class="invalid-feedback">Поле Наименование должно быть заполено!</div>
         </div>
+
         <div class="form-group">
+            <label for="textarea-descr">Описание</label>
+            <textarea class="form-control" id="textarea-descr" rows="3"></textarea>
+        </div>
+
+        <div class="form-group" v-show="is_groups_table">
+            <label for="input-name">Молитва</label>
+            <div class="check_flex">
+                <label for="type-left" class="check radio-left active">
+                    <input type="radio" id="type-left" name="radio" 
+                        v-model="mn_type" value=0>
+                    <span class="title">Личная</span>
+                    <span class="descr">
+                        Молитва, которую Вы добавляете от своего имени, 
+                        ею можно поделится с друзьями и группами.
+                    </span>
+                </label>
+                <label for="type-right" class="check radio-right">
+                    <input type="radio" id="type-right" name="radio"
+                        v-model="mn_type" value=1>
+                    <span class="descr">
+                        Молитва, которую Вы добавляете как администратор группы, 
+                        ею можно поделится только с группами.
+                    </span>
+                    <span class="title">Общая</span>
+                </label>
+            </div>
+        </div>
+
+        <div class="form-group" v-show="!mn_type">
             <label for="input-user">Видно людям</label>
             <div class="users-list">
                 <span class="users-list-text" v-for="(item,i) in add_users_table">
@@ -22,7 +53,7 @@
             <input type="text" class="form-control" id="input-user" placeholder="Начните вводить имя или фамилию">
         </div>
 
-        <div class="form-group" v-show="is_groups_table">
+        <div class="form-group" v-show="!mn_type && is_groups_table">
             <label for="input-user">Видно группам</label>
             <div class="users-list">
                 <span class="users-list-text" v-for="(item,i) in add_groups_table">
@@ -32,11 +63,23 @@
             </div>
             <input type="text" class="form-control" id="input-group" placeholder="Начните вводить название группы">
         </div>
-        
-        <div class="form-group">
-            <label for="textarea-descr">Описание</label>
-            <textarea class="form-control" id="textarea-descr" rows="3"></textarea>
+
+        <div class="form-group" v-show="mn_type">
+            <label for="input-user">Видно группам</label>
+            <div class="users-list">
+                <span class="users-list-text" v-for="(item,i) in add_adm_groups_table">
+                        @{{item.name}}
+                    <span class="x-del" @click="del_adm_gr(item)">X</span>
+                </span>
+            </div>
+            <select class="form-control" id="input-adm-group" multiple>
+                <option v-for="i in admin_groups"
+                    @click="add_adm_gr(i)">
+                    @{{i.name}}
+                </option>
+            </select>
         </div>
+        
         <div id="btn-save-mn" class="btn btn-success">Сохранить</div>
         <div id="btn-cancel-mn" class="btn btn-light">Отмена</div>
     </form>
@@ -46,7 +89,7 @@
     </div>
     
     
-    <div class="prayers-main-table">
+    <div id="main-table" class="prayers-main-table">
         <div class="tbody">
             
             <div class="list-item" v-for="(mn, indx) in mainTable" v-bind:key="indx">
@@ -73,19 +116,30 @@
         <div class="table_empty" v-if="!mainTable.length">
             На этой странице располагается Ваш список молитвенных нужд, он виден только Вам.
         </div>
+        <div>
+            <div id="more_btn" class="btn btn-outline-warning" onclick="getMorePrayers()">
+                Еще
+            </div>
+        </div>
     </div>
 
 
     <div class="edit-form">
         <h5 class="mobile-header-form">Форма редактирования</h5>
-        <div class="form-group" v-show="!edit.is_thanks">
+        <div class="form-group">
             <label for="name-edit">Наименование</label>
-            <input type="text" class="form-control" id="name-edit" v-model.trim="edit.name">
-            <div class="invalid-feedback">Поле Наименование должно быть заполено!</div>
+            <input type="text" class="form-control" id="name-edit" 
+                v-model.trim="edit.name" :disabled="(edit.is_thanks!=0)">
+            <div class="invalid-feedback">
+                Поле Наименование должно быть заполено!
+            </div>
         </div>
-        <div class="form-group" v-show="!edit.is_thanks">
+        <div class="form-group">
             <label for="descr-edit">Описание</label>
-            <textarea class="form-control" id="descr-edit" rows="3" v-model.trim="edit.description"></textarea>
+            <textarea class="form-control" id="descr-edit" 
+                rows="3" v-model.trim="edit.description" 
+                :disabled="(edit.is_thanks!=0)">
+            </textarea>
         </div>
         <div class="form-group" id="result-edit-form" v-show="edit.is_thanks">
             <label for="result-edit">Результат</label>
@@ -99,7 +153,8 @@
                     <span class="x-del" @click="edit_del(i)">X</span>
                 </span>
             </div>
-            <input type="text" class="form-control" id="share-edit" placeholder="Начните вводить имя или фамилию">
+            <input type="text" class="form-control" 
+                id="share-edit" placeholder="Начните вводить имя или фамилию">
         </div>
         <div class="form-group" v-show="!edit.is_thanks && is_groups_table">
             <label for="share-edit">Видно группам</label>
@@ -109,7 +164,8 @@
                     <span class="x-del" @click="edit_del_gr(i)">X</span>
                 </span>
             </div>
-            <input type="text" class="form-control" id="groups-edit" placeholder="Начните вводить название группы">
+            <input type="text" class="form-control" 
+                id="groups-edit" placeholder="Начните вводить название группы">
         </div>
         <div class="btn btn-primary" id="btn-save-edit">Сохранить</div>
         <div id="btn-cancel-edit" class="btn btn-light">Отмена</div>
@@ -117,6 +173,17 @@
     
     <div class="done-form">
         <h4 class="mobile-header-form">Форма завершения</h4>
+        <div class="form-group">
+            <label for="name-edit">Наименование</label>
+            <input type="text" class="form-control" id="name-done" 
+            v-model.trim="done.name" disabled>
+        </div>
+        <div class="form-group">
+            <label for="descr-edit">Описание</label>
+            <textarea class="form-control" id="descr-done" rows="3" 
+                v-model.trim="done.description" disabled>
+            </textarea>
+        </div>
         <div class="form-group">
             <label for="result-done">Результат</label>
             <textarea class="form-control" id="result-done" rows="3" v-model.trim="done.answer"></textarea>
@@ -128,10 +195,6 @@
         </div>
         <div class="btn btn-primary" onclick="saveDoneForm()">Сохранить</div>
         <div class="btn btn-light" onclick="closeDoneForm()">Отмена</div>
-    </div>
-    
-    <div>
-        <div id="more_btn" class="btn btn-outline-warning" onclick="getMorePrayers()">Еще</div>
     </div>
 
     <nav class="drop-down-menu">

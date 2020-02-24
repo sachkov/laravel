@@ -26,7 +26,8 @@ class Group extends Model
     
     public function signed_users()
     {
-        return $this->belongsToMany('App\User', 'user_group', 'group_id', 'user_id');
+        return $this->belongsToMany('App\User', 'user_group', 'group_id', 'user_id')
+            ->withPivot('admin');
     }
 
     public function signed_mn()

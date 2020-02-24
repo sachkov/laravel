@@ -44,6 +44,8 @@ Route::post('/personal/delGroup', 'PersonalController@delGroup');
 
 Route::post('/personal/changeGroupName', 'PersonalController@changeGroupName');
 
+Route::get('/personal/group/{id}', 'PersonalController@showGroup')->name('showGroup');
+
 //Маршрут обработки ajax запросов
 Route::post('/ajax/saveMN', 'AjaxController@saveMN');
 

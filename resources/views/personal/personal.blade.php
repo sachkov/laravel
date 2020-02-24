@@ -16,25 +16,10 @@
                 <table class="table groups">
 
                     <tr v-for="(group, indx) in group_table">
-                        <td v-if="group.is_author" class="group_name">
-                            <input class="group_edit" 
-                                v-model="group.name"
-                                @focus="saveName(indx)"
-                                @blur="changeName(indx)">
-                        </td>
-                        <td v-else  class="group_name">
-                            @{{group.name}}(@{{group.number}})
-                        </td>
-                        <td>
-                            <button @click="leave(indx)"
-                            class="personal-btn leave">
-                                <span class="d-screen">Покинуть группу</span>&nbsp;
-                            </button>
-                            <button @click="del_group(indx)"
-                            v-if="group.is_author"
-                            class="personal-btn delete">
-                            <span class="d-screen">Удалить группу</span>&nbsp;
-                            </button>
+                        <td class="group_name">
+                            <a :href="group.link">
+                                @{{group.name}}(@{{group.number}})
+                            </a>
                         </td>
                     </tr>
 
