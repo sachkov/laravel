@@ -116,7 +116,7 @@ class PersonalController extends Controller
             $Group->name = $request->input('name');
             $Group->author_id = Auth::user()->id;
             $Group->save();
-            $Group->signed_users()->attach(Auth::user()->id);
+            $Group->signed_users()->attach(Auth::user()->id, ['admin' => 1]);
             
             $out['success'] = $Group->id;
         } 
@@ -174,15 +174,18 @@ class PersonalController extends Controller
         if(Auth::check()){ 
             $this->validate($request, [
                 'group' => 'required|numeric|max:1000',
+                'user_id' => 'numeric|max:100000'
               ]);
-            
+            $user_id = $request->input('user_id')
+                        ?$request->input('user_id')
+                        :Auth::user()->id;
             $count = DB::table('user_group')
                 ->where('group_id', $request->input('group'))
                 ->count();
             DB::table('user_group')
                 ->where(
                 [   
-                    ['user_id', '=', Auth::user()->id], 
+                    ['user_id', '=', $user_id], 
                     ['group_id', '=', $request->input('group')]
                 ])
                 ->delete();
@@ -207,6 +210,7 @@ class PersonalController extends Controller
     /*
         Удаление группы
     */
+    /*
     public function delGroup(Request $request)
     {
         if(Auth::check()){ 
@@ -232,7 +236,7 @@ class PersonalController extends Controller
         }
 
         return response()->json( $out );
-    }
+    }*/
 
     /*
         Изменение наименования группы
@@ -244,20 +248,21 @@ class PersonalController extends Controller
                 'id' => 'required|numeric|max:1000',
                 'name' => ['required', 'regex:/^[\w-\d\sА-Яа-я"()\. ]{0,100}/u']
               ]);
-            $group = DB::table('groups')
-              ->where([
-                  ['author_id', '=', Auth::user()->id],
-                  ['id', '=', $request->input('id')]
+            $group = DB::table('user_group')
+                ->where([
+                  ['user_id', '=', Auth::user()->id],
+                  ['group_id', '=', $request->input('id')],
+                  ["admin", '=', 1]
               ])
               ->first();
-            if($group->id == $request->input('id')){
+            if($group->group_id == $request->input('id')){
                
-                $group_model = Group::find($group->id);
+                $group_model = Group::find($group->group_id);
                 $group_model->name = $request->input('name');
                 $group_model->save();
                 $out['success'] = 'Группа переименована';
             }else{
-                $out['error'] = 'Переименовать можно только собственную группу.';
+                $out['error'] = 'Только администраторы могут переименовывать группу.';
             }
         }else{
             $out['error'] = 'У вас нет доступа';
@@ -302,19 +307,26 @@ class PersonalController extends Controller
         $user_groups = DB::table("user_group")
             ->where("user_id", Auth::user()->id)
             ->get();
-        foreach($user_groups as $group)
-            $arGroupid[] = $group->group_id;
+        foreach($user_groups as $user)
+            $arGroupid[$user->group_id] = $user->admin;
         foreach($groups as $group){
             $arGroups[] = [
                 "name"=>$group->name, 
                 "number"=>$group->users_count, 
                 "id"=>$group->id,
                 "is_author"=>($group->author_id == Auth::user()->id)?1:0,
-                "is_member"=>intval(in_array($group->id, $arGroupid))
+                "is_member"=>intval(in_array(
+                    $group->id, 
+                    array_keys($arGroupid)
+                )),
+                "link"=>route('showGroup',["id"=>$group->id]),
+                "admin"=>intval($arGroupid[$user->group_id]),
             ];
         }
+
         return $arGroups;
     }
+
 
     /**
      * Страница о сайте
@@ -322,5 +334,57 @@ class PersonalController extends Controller
     public function about()
     {
         return view('personal.about');
+    }
+
+    /*
+    *   Страница группы
+    */
+    public function showGroup($id)
+    {
+        $group = Group::findOrFail($id);
+        $is_admin = false;
+
+        foreach($group->signed_users as $user){
+            if($user->id == Auth::user()->id && $user->pivot->admin){
+                $is_admin = true;
+                break;
+            }
+        }
+        return view('personal.group', ['group' => $group, "is_admin"=>$is_admin]);
+        
+    }
+
+    /*
+    *   Добавить пользователю статус админа
+    */
+    public function addAdmin(Request $request)
+    {
+        $this->validate($request, [
+            'group_id' => 'required|numeric|max:10000',
+            'user_id' => 'required|numeric|max:100000'
+        ]);
+        DB::table('user_group')
+            ->where('group_id', $request->input('group_id'))
+            ->where('user_id', $request->input('user_id'))
+            ->update(['admin' => 1]);
+            
+        return "Обновление успешно.";
+    }
+
+    /*
+    *   Добавить пользователю статус админа
+    */
+    public function delAdmin(Request $request)
+    {
+        $this->validate($request, [
+            'group_id' => 'required|numeric|max:10000',
+            'user_id' => 'required|numeric|max:100000'
+        ]);
+        DB::table('user_group')
+            ->where('group_id', $request->input('group_id'))
+            ->where('user_id', $request->input('user_id'))
+            ->update(['admin' => null]);
+            
+        return "Обновление успешно.";
     }
 }

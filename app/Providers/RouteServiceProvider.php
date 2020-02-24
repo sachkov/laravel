@@ -23,7 +23,8 @@ class RouteServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        // параметр id теперь всегда должен соответствовать этой регулярке
+        Route::pattern('id', '[0-9]+');
 
         parent::boot();
     }
