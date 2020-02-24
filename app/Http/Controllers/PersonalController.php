@@ -353,4 +353,38 @@ class PersonalController extends Controller
         return view('personal.group', ['group' => $group, "is_admin"=>$is_admin]);
         
     }
+
+    /*
+    *   Добавить пользователю статус админа
+    */
+    public function addAdmin(Request $request)
+    {
+        $this->validate($request, [
+            'group_id' => 'required|numeric|max:10000',
+            'user_id' => 'required|numeric|max:100000'
+        ]);
+        DB::table('user_group')
+            ->where('group_id', $request->input('group_id'))
+            ->where('user_id', $request->input('user_id'))
+            ->update(['admin' => 1]);
+            
+        return "Обновление успешно.";
+    }
+
+    /*
+    *   Добавить пользователю статус админа
+    */
+    public function delAdmin(Request $request)
+    {
+        $this->validate($request, [
+            'group_id' => 'required|numeric|max:10000',
+            'user_id' => 'required|numeric|max:100000'
+        ]);
+        DB::table('user_group')
+            ->where('group_id', $request->input('group_id'))
+            ->where('user_id', $request->input('user_id'))
+            ->update(['admin' => null]);
+            
+        return "Обновление успешно.";
+    }
 }

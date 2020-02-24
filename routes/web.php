@@ -42,6 +42,10 @@ Route::post('/personal/leaveGroup', 'PersonalController@leaveGroup');
 
 Route::post('/personal/delGroup', 'PersonalController@delGroup');
 
+Route::post('/personal/addAdmin', 'PersonalController@addAdmin');
+
+Route::post('/personal/delAdmin', 'PersonalController@delAdmin');
+
 Route::post('/personal/changeGroupName', 'PersonalController@changeGroupName');
 
 Route::get('/personal/group/{id}', 'PersonalController@showGroup')->name('showGroup');

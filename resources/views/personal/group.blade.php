@@ -37,7 +37,7 @@
                     @if($user->pivot->admin)
                         <span>Администратор</span>
                     @else
-                        <span class="btn btn-danger" onclick="remove({{$group->id}},{{$user->id}})">
+                        <span class="btn btn-danger" onclick="leave({{$group->id}},{{$user->id}})">
                             Исключить
                         </span>
                         <span class="btn btn-success" 

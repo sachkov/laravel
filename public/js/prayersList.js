@@ -5,6 +5,7 @@ var vm = new Vue({
         groups: {},
         group_name: {},
         authors: [],
+        admin: [],      //массив ИД МН добавленных администратором
     },
     methods:{
         getMorePrayers(d){
@@ -43,6 +44,8 @@ function getPrayersList(last_date="", group_id=0){
                     vm.group_name[z] = data.groups[z];
                 for(y in data.authors)
                     vm.authors[y] = data.authors[y];
+                for(a in data.admin)
+                    vm.admin[a] = data.admin[a];
                 if(data.MN.length < 30){
                     $("#more_btn").hide();
                 }

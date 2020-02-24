@@ -26,7 +26,14 @@ class AjaxController extends Controller
             $MN_model->author_id = Auth::user()->id;
             $MN_model->save();
             $MN_model->signed_users()->sync(json_decode($request->input('users')));
-            $MN_model->signed_groups()->sync(json_decode($request->input('groups')));
+            $arGroupsID = [];
+            if($request->input('by_admin')){
+                foreach(json_decode($request->input('groups')) as $gr)
+                    $arGroupsID[$gr] = ["by_admin"=>1];
+            }else{
+                $arGroupsID = json_decode($request->input('groups'));
+            }
+            $MN_model->signed_groups()->attach($arGroupsID);
             
             $out['success'] = $request->input('name');
         } 
@@ -189,6 +196,7 @@ class AjaxController extends Controller
         $groups = [];
         $authors = [];
         $arG = [];
+        $admin = [];
         $num = 30;  //сколько записей получаем за раз
 
         // Получаем группы в которых состоит пользователь
@@ -218,7 +226,7 @@ class AjaxController extends Controller
 
         $groups_id = DB::table('mn')
             ->leftJoin('mn_group', 'mn.id', '=', 'mn_group.mn_id')
-            ->select('mn.id', 'mn_group.group_id', 'mn.author_id')
+            ->select('mn.id', 'mn_group.group_id', 'mn.author_id', 'mn_group.by_admin')
             ->whereIn('mn_group.group_id', array_keys($groups))
             ->whereNull('no_active')
             ->whereNull('end_date')
@@ -242,6 +250,8 @@ class AjaxController extends Controller
         foreach($groups_id as $mn){
             $arG[$mn->id][] = $mn->group_id;
             $authors[] = $mn->author_id;
+            if($mn->by_admin)
+                $admin[] = $mn->id;
         }
 
         foreach($users as $umn){
@@ -274,6 +284,7 @@ class AjaxController extends Controller
             "authors"=>$arAuthors,
             "mn_groups"=>$arG,
             "MN"=>$objMN2,
+            "admin"=>$admin,
         ] );
     }
 

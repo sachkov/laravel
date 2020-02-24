@@ -269,8 +269,15 @@ function saveMN(){
     for(i in vm.add_users_table){
         res.push(vm.add_users_table[i].value);
     }
-    for(i in vm.add_groups_table){
-        resG.push(vm.add_groups_table[i].value);
+    
+    if(vm.mn_type){
+        for(i in vm.add_adm_groups_table){
+            resG.push(vm.add_adm_groups_table[i].id);
+        }
+    }else{
+        for(i in vm.add_groups_table){
+            resG.push(vm.add_groups_table[i].value);
+        }
     }
     //отправка ajax
     $.ajax({
@@ -284,6 +291,7 @@ function saveMN(){
             _token: $('#x_token').val(),
             name: name,
             text: $("#textarea-descr").val(),
+            by_admin: vm.mn_type,
             users: JSON.stringify(res),
             groups: JSON.stringify(resG),
         },

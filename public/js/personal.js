@@ -16,7 +16,10 @@ $( document ).ready(function(){
             addUser();
         }
     });
-    getGroups();
+    if($("#v-personal-groups").length){
+        getGroups();
+    }
+        
 });
 
 /*
@@ -69,7 +72,7 @@ function createGroup(){
         success: function(data){
             try{
                 console.log(data);
-                location.reload();
+                location.reload(true);
             }catch{
                 console.log("createGroup data error!");
             }
@@ -209,13 +212,14 @@ function leave(group_indx){
     globalAjax(
         "/personal/leaveGroup",
         {group: group_indx},
-        function(){
-            location.reload();
-        },
+        function(){location.reload(true);},
         ()=>{}
     );
 }
 
+/*
+*   Изменить название группы
+*/
 function changeName(group_indx){
     if($("#group_name").val() !=
         $(".info.group_name").html()
@@ -226,12 +230,15 @@ function changeName(group_indx){
                 name: $("#group_name").val(),
                 id: group_indx
             },
-            function(){location.reload();},
-            ()=>{}
+            function(){location.reload(true);},
+            ()=>{location.reload(true);}
         );
     }
 }
 
+/*
+*   Добавить пользователю статус админа
+*/
 function admin(group_id, user_id){
     globalAjax(
         "/personal/addAdmin",
@@ -239,11 +246,16 @@ function admin(group_id, user_id){
             group_id: group_id,
             user_id: user_id
         },
-        function(){location.reload();},
-        ()=>{}
+        function(data){
+            console.log(data);
+            location.reload(true);},
+        ()=>{location.reload(true);}
     );
 }
 
+/*
+*   Удалить статус админа для пользователя
+*/
 function del_admin(group_id, user_id){
     globalAjax(
         "/personal/delAdmin",
@@ -251,19 +263,10 @@ function del_admin(group_id, user_id){
             group_id: group_id,
             user_id: user_id
         },
-        function(){location.reload();},
-        ()=>{}
-    );
-}
-function remove(group_id, user_id){
-    globalAjax(
-        "/personal/leaveGroup",
-        {
-            group: group_id,
-            user_id: user_id
-        },
-        function(){location.reload();},
-        ()=>{}
+        function(data){
+            console.log(data);
+            location.reload(true);},
+        ()=>{location.reload(true);}
     );
 }
 

@@ -21,7 +21,9 @@
             </div>
             <div class="text-column">
                 <p class="header">
-                    <span>@{{authors[arMN[mn].author_id].name}}</span>
+                    <span v-show="!admin.includes(mn)">
+                        @{{authors[arMN[mn].author_id].name}}
+                    </span>
                     <span style="color: green;"
                         v-show="arMN[mn].answer_date && arMN[mn].answer">
                         Благодарность
