@@ -1,3 +1,6 @@
+body{
+    overflow-x: hidden;
+}
 .main-section{
     min-height: calc(100vh - 270px);
 }
@@ -556,20 +559,44 @@ footer .footer .contacts{
     }
     .header-first-line nav{display: none;}
     .header-first-line .enter_link{
-        width: auto;
-        height: auto;
+        min-width: 170px;
+        max-width: 65%;
+        height: calc(100vh - 70px);
         align-items: center;
+        justify-content: start;
         flex-direction: column;
         position: absolute;
-        top: -200px;
-        right: 0;
-        transition: top 500ms ease-in;
+        top: 70px;
+        right: -100%;
+        bottom: 0;
+        transition: right 500ms ease-out;
         display: flex;
-        background-color: DarkKhaki;
+        background-color: Wheat;
+        margin: 0;
+        padding: 10px 5px;
     }
-    #menu-checkbox:checked + .enter_link{top: 70px;}
-
-    .header-first-line .mobile-menu{display: block; margin-right: 10px;}
+    .header-first-line .enter_link.show{
+        right: 0;
+    }
+    .header-first-line .enter_link .name{
+        font-weight: bold;
+        font-style: italic;
+    }
+    .header-first-line .enter_link .list{
+        line-height: 2;
+    }
+    .header-first-line .enter_link .link{
+        cursor: pointer;
+    }
+    .header-first-line .enter_link .page_menu{
+        border-top: 3px solid grey;
+        padding-top: 10px;
+    }
+    .header-first-line .mobile-menu{
+        display: block;
+        margin-right: 10px;
+        cursor: pointer;
+    }
 
     .header-piсture .quote{width: 200px;top: 90px;right: 50px;font-size: 14px;}
     .News h3, .Calendar h3, .Location h3, .feedback-form h3, .aboutCherch h3{font-size: 20px; }

@@ -127,6 +127,22 @@ $( document ).ready(function(){
             $(".drop-down-menu").hide();
             vm.active_index = 0;
         }
+
+        //..Закрывает меню
+        if( $(".enter_link").hasClass("show") 
+            && 
+            !$(".mobile-menu").is(e.target)
+        ){
+            $(".enter_link").removeClass("show");
+        }
+    });
+
+    // Нажатие на "открыть меню"
+    $(".mobile-menu").on("click", function(){
+        if($(".enter_link").hasClass("show"))
+            $(".enter_link").removeClass("show");
+        else
+            $(".enter_link").addClass("show");
     });
     //Нажатие на "Добавить"
     $("#btn-add-mn").on("click",function(){
@@ -173,6 +189,20 @@ $( document ).ready(function(){
             $(this).addClass("active");
             $(this).find("span").html("Скрыть описание");
             $("#desc-"+$(this).parents(".t-tr").data("mnid")).show();
+        }
+    });
+
+    //Нажатие на пункт меню Показать (личные->все->общие)
+    $("#view_mode").on("click", function(){
+        if($(this).data("mode") == "personal"){
+            $(this).html("Показать общие");
+            $(this).data("mode", "all");
+        }else if($(this).data("mode") == "all"){
+            $(this).html("Показать личные");
+            $(this).data("mode", "public");
+        }else if($(this).data("mode") == "public"){
+            $(this).html("Показать все");
+            $(this).data("mode", "personal");
         }
     });
 });

@@ -49,16 +49,14 @@
                         </div>
                         
                     </div>
-                    <label for="menu-checkbox">
-                        <img class="mobile-menu" src="/img/icons8-menu-filled.svg" alt="menu">
-                    </label>
-                    <input id="menu-checkbox" type="checkbox" style="display: none;"/>
+                    <img class="mobile-menu" src="/img/icons8-menu-filled.svg" alt="menu">
+                    
                     <div class="enter_link">
                         @if (Auth::guest())
                             <a class="list" href="{{ route('login') }}">Войти</a>
                             <a class="list" href="{{ route('register') }}">Зарегистрироваться</a>
                         @else
-                            <span class="list">{{ Auth::user()->name }}</span>
+                            <span class="list name">{{ Auth::user()->name }}</span>
                             <a class="list" href="{{route('home')}}">Мои нужды</a>
                             <a class="list" href="{{route('list')}}">Молитвы</a>
                             <a class="list" href="{{route('personal')}}">Личный кабинет</a>
@@ -70,6 +68,9 @@
                             <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
                                 {{ csrf_field() }}
                             </form>
+                            <div class="page_menu">
+                            @yield('page_menu')
+                            </div>
                         @endif
                     </div>
                 </div>

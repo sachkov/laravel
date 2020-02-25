@@ -215,6 +215,12 @@
 </script>
 @endsection
 
+@section('page_menu')
+    <span id="view_mode" class="list link" data-mode="personal">
+        Показать все
+    </span>
+@endsection
+
 @section('script')
     <script src="{{ asset('js/prayers.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@8"></script>
