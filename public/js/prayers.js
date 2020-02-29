@@ -10,13 +10,13 @@ var vm = new Vue({
         is_thanks: 0,           // Является ли нужда - благодарностью
         is_groups_table: false, // Состоит ли пользователь в группах
         add_groups_table: [],   // Список групп при добавлении мн
-        add_adm_groups_table: [], //Список админ групп при добавлении мн
+        //add_adm_groups_table: [], //Список админ групп при добавлении мн //l-7
         edit_groups_table: [],  // Список групп при редактировании мн
         active_index: 0,        // индекс элемента списка, на котором открыли меню
         mn_type: 0,             // тип добавляемой нужды (личная/от админа)
 
         user_groups: [],    //Группы, в которых состоит пользователь
-        admin_groups: [],   //Группы в которых автор - админ
+        //admin_groups: [],   //Группы в которых автор - админ  //l-7
     },
     methods:{
         del: function(a){
@@ -81,7 +81,7 @@ var vm = new Vue({
             vm.edit_groups_table.splice(a,1); 
         },
         // удаление админ группы в форме добавления МН
-        del_adm_gr: function(a){
+        /*del_adm_gr: function(a){  //l-7
             vm.add_adm_groups_table.splice(
                 vm.add_adm_groups_table.indexOf(a),
                 1
@@ -96,7 +96,7 @@ var vm = new Vue({
         edit_adm_gr: function(gr){
             if(vm.edit_groups_table.indexOf(gr) == -1)
                 vm.edit_groups_table.push(gr);
-        },
+        },*/
     },
 });
 
@@ -149,7 +149,7 @@ $( document ).ready(function(){
         $("#input-user").val("");
         vm.add_users_table = [];
         vm.add_groups_table = [];
-        vm.add_adm_groups_table = [];
+        //vm.add_adm_groups_table = []; //l-7
         $("#main-table").show();
     });
     
@@ -293,7 +293,7 @@ function saveMN(){
         res.push(vm.add_users_table[i].value);
     }
     
-    if(vm.mn_type){
+    /*if(vm.mn_type){       //l-7
         for(i in vm.add_adm_groups_table){
             resG.push(vm.add_adm_groups_table[i].id);
         }
@@ -301,7 +301,11 @@ function saveMN(){
         for(i in vm.add_groups_table){
             resG.push(vm.add_groups_table[i].value);
         }
+    }*/
+    for(i in vm.add_groups_table){
+        resG.push(vm.add_groups_table[i].value);
     }
+
     //отправка ajax
     $.ajax({
         type: "POST",
@@ -325,7 +329,7 @@ function saveMN(){
             $("#textarea-descr").val("");
             vm.add_users_table = [];
             vm.add_groups_table = [];
-            vm.add_adm_groups_table = [];
+            //vm.add_adm_groups_table = []; //l-7
             getTable();
             $("#main-table").show();
         },
@@ -524,15 +528,11 @@ function fillAutocomplite(groups){
                 label: groups[x].name,
                 value: groups[x].id
             });
-            if(groups[x].admin)
+            /*if(groups[x].admin)       //l-7
             vm.admin_groups.push({
                 name: groups[x].name,
                 id: groups[x].id
-            });
-            /*$("#input-adm-group").append(
-                '<option value="'+groups[x].id+
-                '">'+groups[x].name+'</option>'
-            );*/
+            });*/
         }
     }
     

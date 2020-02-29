@@ -23,7 +23,7 @@
             <div class="check_flex">
                 <label for="type-left" class="check radio-left active">
                     <input type="radio" id="type-left" name="radio" 
-                        v-model="mn_type" value=0>
+                        v-model="mn_type" value=0 hidden>
                     <span class="title">Личная</span>
                     <span class="descr">
                         Молитва, которую Вы добавляете от своего имени, 
@@ -32,7 +32,7 @@
                 </label>
                 <label for="type-right" class="check radio-right">
                     <input type="radio" id="type-right" name="radio"
-                        v-model="mn_type" value=1>
+                        v-model="mn_type" value=1 hidden>
                     <span class="descr">
                         Молитва, которую Вы добавляете как администратор группы, 
                         ею можно поделится только с группами.
@@ -53,7 +53,7 @@
             <input type="text" class="form-control" id="input-user" placeholder="Начните вводить имя или фамилию">
         </div>
 
-        <div class="form-group" v-show="!mn_type && is_groups_table">
+        <div class="form-group" v-show="is_groups_table">
             <label for="input-user">Видно группам</label>
             <div class="users-list">
                 <span class="users-list-text" v-for="(item,i) in add_groups_table">
@@ -64,6 +64,7 @@
             <input type="text" class="form-control" id="input-group" placeholder="Начните вводить название группы">
         </div>
 
+        <?/*    //l-7
         <div class="form-group" v-show="mn_type">
             <label for="input-user">Видно группам</label>
             <div class="users-list">
@@ -79,6 +80,7 @@
                 </option>
             </select>
         </div>
+        */?>
         
         <div id="btn-save-mn" class="btn btn-success">Сохранить</div>
         <div id="btn-cancel-mn" class="btn btn-light">Отмена</div>

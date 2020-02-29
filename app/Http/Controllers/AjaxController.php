@@ -45,6 +45,9 @@ class AjaxController extends Controller
         return response()->json( $out );
     }
     
+    /**
+     * Получение таблицы "моих молитв"
+     */
     public function getTable(Request $request)
     {
         if(Auth::check())
@@ -226,9 +229,6 @@ class AjaxController extends Controller
                 $str = $group->name;
             $groups[$group->group_id] = $str;
         }
-
-// !!!!!!! Добавить where('mn.updated_at', '>', $last_date) !!!!!!!!
-// !!!!!!! ->where("updated_at", ">", "2020-02-01 00:00:00") !!!!!!!
         
         $updated_at = "2040-01-01 00:00:00";    //1577822400
         if( $request->input('last_date')
@@ -264,8 +264,6 @@ class AjaxController extends Controller
         foreach($groups_id as $mn){
             $arG[$mn->id][] = $mn->group_id;
             $authors[] = $mn->author_id;
-            if($mn->by_admin)
-                $admin[] = $mn->id;
         }
 
         foreach($users as $umn){
