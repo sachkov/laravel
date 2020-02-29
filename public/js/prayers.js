@@ -127,23 +127,8 @@ $( document ).ready(function(){
             $(".drop-down-menu").hide();
             vm.active_index = 0;
         }
-
-        //..Закрывает меню
-        if( $(".enter_link").hasClass("show") 
-            && 
-            !$(".mobile-menu").is(e.target)
-        ){
-            $(".enter_link").removeClass("show");
-        }
     });
 
-    // Нажатие на "открыть меню"
-    $(".mobile-menu").on("click", function(){
-        if($(".enter_link").hasClass("show"))
-            $(".enter_link").removeClass("show");
-        else
-            $(".enter_link").addClass("show");
-    });
     //Нажатие на "Добавить"
     $("#btn-add-mn").on("click",function(){
         $(this).parent().hide();

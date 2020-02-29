@@ -65,7 +65,7 @@
                                 document.getElementById('logout-form').submit();">
                                 Выход
                             </a>
-                            <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                            <form id="logout-form" action="{{ route('logout') }}" method="POST">
                                 {{ csrf_field() }}
                             </form>
                             <div class="page_menu">
@@ -93,6 +93,7 @@
     </div>
     <!-- Scripts -->
     <script src="{{ asset('js/app.js') }}"></script>
+    <script src="{{ asset('js/common.js') }}"></script>
     <!-- Custom scripts -->
     @yield('script')
      <!-- JQuery UI scripts -->
