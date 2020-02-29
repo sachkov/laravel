@@ -61,7 +61,14 @@
                     <span class="x-del" @click="del_gr(i)">X</span>
                 </span>
             </div>
-            <input type="text" class="form-control" id="input-group" placeholder="Начните вводить название группы">
+            <?/*<input type="text" class="form-control" id="input-group" placeholder="Начните вводить название группы">*/?>
+            <select class="form-control" id="select-group" @change="add_gr($event)">
+                <option default>Выберите группу</option>
+                <option v-for="(x, index) in user_groups"
+                    :value="index">
+                    @{{x.label}}
+                </option>
+            </select>
         </div>
 
         <?/*    //l-7
@@ -81,6 +88,24 @@
             </select>
         </div>
         */?>
+
+        <div class="form-group" v-show="mn_type && is_groups_table">
+            <label for="input-user">Показывать по графику</label>
+            <div class="select_flex">
+                <select class="form-control" id="week-day" v-model="week_day">
+                    <option v-for="(day, index) in week"
+                        :value="index">
+                        @{{day}}
+                    </option>
+                </select>
+                <select class="form-control" id="month-day" v-model="month_day">
+                    <option v-for="(day, index) in month"
+                        :value="index">
+                        @{{day}}
+                    </option>
+                </select>
+            </div>
+        </div>
         
         <div id="btn-save-mn" class="btn btn-success">Сохранить</div>
         <div id="btn-cancel-mn" class="btn btn-light">Отмена</div>
@@ -166,9 +191,37 @@
                     <span class="x-del" @click="edit_del_gr(i)">X</span>
                 </span>
             </div>
+            <?/*
             <input type="text" class="form-control" 
                 id="groups-edit" placeholder="Начните вводить название группы">
+            */?>
+            <select class="form-control" id="edit-group" @change="edit_gr($event)">
+                <option default>Выберите группу</option>
+                <option v-for="(x, index) in user_groups"
+                    :value="index">
+                    @{{x.label}}
+                </option>
+            </select>
         </div>
+
+        <div class="form-group" v-show="!edit.is_thanks && is_groups_table">
+            <label for="input-user">Показывать по графику</label>
+            <div class="select_flex">
+                <select class="form-control" id="week-day" v-model="week_day">
+                    <option v-for="(day, index) in week"
+                        :value="index">
+                        @{{day}}
+                    </option>
+                </select>
+                <select class="form-control" id="month-day" v-model="month_day">
+                    <option v-for="(day, index) in month"
+                        :value="index">
+                        @{{day}}
+                    </option>
+                </select>
+            </div>
+        </div>
+
         <div class="btn btn-primary" id="btn-save-edit">Сохранить</div>
         <div id="btn-cancel-edit" class="btn btn-light">Отмена</div>
     </div>
@@ -207,7 +260,7 @@
         </ul>
     </nav>
 
-    <pre><?//print_r($ar);?></pre>
+    <pre><?//echo config('app.env');?></pre>
 
 </div>
 <script>

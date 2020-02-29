@@ -226,6 +226,9 @@ body{
 @media (min-width:576px){
     .check_flex .check{height: 40px;}
 }
+.select_flex{
+    display: flex;
+}
 /*prayers end*/
 
 .welcome-body{margin: 0;}
@@ -406,6 +409,9 @@ body{
 .header-first-line .enter_link a.list{
     font-weight: 300;
     text-decoration: none;
+}
+.header-first-line .enter_link .link{
+    cursor: pointer;
 }
 .header-first-line .mobile-menu{
     display: none;

@@ -17,6 +17,11 @@ var vm = new Vue({
 
         user_groups: [],    //Группы, в которых состоит пользователь
         //admin_groups: [],   //Группы в которых автор - админ  //l-7
+        week: ["День недели", 'Понедельник', 'Вторник', 'Среда', 'Четверг',
+                 'Пятница', 'Суббота', 'Воскресенье'],
+        week_day: 0,
+        
+        month_day: 0,
     },
     methods:{
         del: function(a){
@@ -97,7 +102,38 @@ var vm = new Vue({
             if(vm.edit_groups_table.indexOf(gr) == -1)
                 vm.edit_groups_table.push(gr);
         },*/
+        // добавление группы в форме добавления МН //l-7-2
+        add_gr: function(event){          
+            if(
+                vm.add_groups_table.
+                indexOf(vm.user_groups[event.target.value]) == -1
+            )
+                vm.add_groups_table.push(vm.user_groups[event.target.value]);
+            
+            $('#select-group').prop('selected', function() {
+                return this.defaultSelected;
+            });
+        },
+        // добавление группы в форме редактирования МН //l-7-2
+        edit_gr: function(gr){
+            if(
+                vm.edit_groups_table.
+                indexOf(vm.user_groups[event.target.value]) == -1
+            )
+                vm.edit_groups_table.push(vm.user_groups[event.target.value]);
+            
+            $('#edit-group').prop('selected', function() {
+                return this.defaultSelected;
+            });
+        },
     },
+    computed: {
+        month: function(){
+            var ar = ["День месяца"];
+            for(i=1;i<32;i++) ar.push(i);
+            return ar; 
+        },
+    }
 });
 
 var arUsers = {}; //Список всех пользователей
@@ -537,6 +573,7 @@ function fillAutocomplite(groups){
     }
     
     vm.is_groups_table = table.length > 0;
+    /*  //l-7-2
     $('#input-group').autocomplete({
         minLength: 1,
         source: table,
@@ -547,9 +584,9 @@ function fillAutocomplite(groups){
         change: function( event, ui ) {
             $("#input-group").val("");
         }
-    });
-    $('#input-group').addClass("test");
+    });*/
     //console.log(table);
+    /*  //l-7-2
     $('#groups-edit').autocomplete({
         minLength: 1,
         source: table,
@@ -563,7 +600,7 @@ function fillAutocomplite(groups){
         change: function( event, ui ) {
             $("#groups-edit").val("");
         }
-    });
+    });*/
 }
 
 /*
