@@ -206,6 +206,7 @@
     </nav>
 
     <pre><?//print_r($ar);?></pre>
+
 </div>
 <script>
     let auth = true;

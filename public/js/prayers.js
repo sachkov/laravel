@@ -193,16 +193,23 @@ $( document ).ready(function(){
     });
 
     //Нажатие на пункт меню Показать (личные->все->общие)
+    
     $("#view_mode").on("click", function(){
         if($(this).data("mode") == "personal"){
+            mode = "all";
             $(this).html("Показать общие");
-            $(this).data("mode", "all");
+            $(this).data("mode", mode);
+            getTable(0);
         }else if($(this).data("mode") == "all"){
+            mode = "public";
             $(this).html("Показать личные");
-            $(this).data("mode", "public");
+            $(this).data("mode", mode);
+            getTable(0);
         }else if($(this).data("mode") == "public"){
+            mode = "personal";
             $(this).html("Показать все");
-            $(this).data("mode", "personal");
+            $(this).data("mode", mode);
+            getTable(0);
         }
     });
 });
@@ -216,7 +223,8 @@ function getTable(offset = 0){
                 'X-CSRF-TOKEN': $('#x_token').val()
             },
         data: {
-            offset: offset
+            offset: offset,
+            mode: $("#view_mode").data("mode"),
         },
         success: function(data){
             if(!data.table && !data.count){
@@ -229,10 +237,10 @@ function getTable(offset = 0){
                     vm.mainTable.push(data.table[x]);
             }else vm.mainTable = data.table;
                 
-            if(data.count && vm.mainTable.length < data.count){
-                $("#more_btn").show();
-            }else{
+            if(data.end){
                 $("#more_btn").hide();
+            }else{
+                $("#more_btn").show();
             }
         },
         error: function(data) {
@@ -255,7 +263,7 @@ function getUsers(){
             for(x in data){
                 arUsers.push({label: data[x], value:x});
             }
-            console.log(arUsers);
+            //console.log(arUsers);
             $("#input-user").autocomplete({
                 minLength: 1,
                 source: arUsers,

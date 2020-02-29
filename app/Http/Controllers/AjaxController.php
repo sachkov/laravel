@@ -50,11 +50,24 @@ class AjaxController extends Controller
         if(Auth::check())
         {
             $r = [];
-            $MN_model = new \App\Models\MN;
+            $num = 10;          //Кол-во записей в выборке
             $offset = 0;
+            $MN_model = new \App\Models\MN;
             if($request->input('offset'))
                 $offset = $request->input('offset');
+
             $prayers = $MN_model::where('author_id', Auth::user()->id)
+                ->select("mn.*");
+            // Применение фильтра личные/общие/все
+            if($request->input('mode') != 'all'){
+                $public = null;
+                if($request->input('mode') == 'public')
+                    $public = 1;
+                $prayers = $prayers->leftJoin('mn_group', 'mn.id', '=', 'mn_group.mn_id')
+                    ->where('mn_group.by_admin', $public);
+            }
+
+            $prayers = $prayers->groupBy('mn.id')
                 ->whereNull('no_active')
                 ->whereNull('end_date')
                 ->orderBy('updated_at', 'desc')
@@ -62,6 +75,7 @@ class AjaxController extends Controller
                 ->take(10)
                 ->get();
             $table = [];
+            $count = 0;
             foreach($prayers as $k=>$pr){
                 $r = [];
                 $g = [];
@@ -82,12 +96,12 @@ class AjaxController extends Controller
                 $table[$k]["author"] = ["name"=>$pr->author->name, "email"=>$pr->author->email];
                 $table[$k]["users"] = $r;
                 $table[$k]["groups"] = $g;
+                $count++;
             }
-            $count = $MN_model::where('author_id', Auth::user()->id)
-                ->whereNull('end_date')
-                ->count();
+            $end = true;
+            if($count==$num)$end = false;
             
-            $res = ["table"=>$table, "count"=>$count];
+            $res = ["table"=>$table, "end"=>$end];
         } 
         else {
             $res['error'] = 'У вас нет доступа';
