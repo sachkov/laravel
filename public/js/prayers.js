@@ -20,8 +20,9 @@ var vm = new Vue({
         week: ["День недели", 'Понедельник', 'Вторник', 'Среда', 'Четверг',
                  'Пятница', 'Суббота', 'Воскресенье'],
         week_day: 0,
-        
         month_day: 0,
+        week_day_edit: 0,
+        month_day_edit: 0,
     },
     methods:{
         del: function(a){
@@ -185,6 +186,7 @@ $( document ).ready(function(){
         $("#input-user").val("");
         vm.add_users_table = [];
         vm.add_groups_table = [];
+        vm.mn_type = 0;
         //vm.add_adm_groups_table = []; //l-7
         $("#main-table").show();
     });
@@ -365,6 +367,7 @@ function saveMN(){
             $("#textarea-descr").val("");
             vm.add_users_table = [];
             vm.add_groups_table = [];
+            vm.mn_type = 0;
             //vm.add_adm_groups_table = []; //l-7
             getTable();
             $("#main-table").show();

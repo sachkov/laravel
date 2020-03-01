@@ -172,7 +172,8 @@
             <label for="result-edit">Результат</label>
             <textarea class="form-control" id="result-edit" rows="3" v-model.trim="edit.answer"></textarea>
         </div>
-        <div class="form-group" v-show="!edit.is_thanks">
+
+        <div class="form-group" v-show="!edit.is_thanks && !edit.by_admin">
             <label for="share-edit">Видно людям</label>
             <div class="users-list">
                 <span class="users-list-text" v-for="(item,i) in edit_users_table">
@@ -183,6 +184,7 @@
             <input type="text" class="form-control" 
                 id="share-edit" placeholder="Начните вводить имя или фамилию">
         </div>
+
         <div class="form-group" v-show="!edit.is_thanks && is_groups_table">
             <label for="share-edit">Видно группам</label>
             <div class="users-list">
@@ -204,16 +206,16 @@
             </select>
         </div>
 
-        <div class="form-group" v-show="!edit.is_thanks && is_groups_table">
+        <div class="form-group" v-show="!edit.is_thanks && edit.by_admin">
             <label for="input-user">Показывать по графику</label>
             <div class="select_flex">
-                <select class="form-control" id="week-day" v-model="week_day">
+                <select class="form-control" id="week-day" v-model="week_day_edit">
                     <option v-for="(day, index) in week"
                         :value="index">
                         @{{day}}
                     </option>
                 </select>
-                <select class="form-control" id="month-day" v-model="month_day">
+                <select class="form-control" id="month-day" v-model="month_day_edit">
                     <option v-for="(day, index) in month"
                         :value="index">
                         @{{day}}
@@ -261,6 +263,7 @@
     </nav>
 
     <pre><?//echo config('app.env');?></pre>
+    <pre><?//var_dump($ar);?></pre>
 
 </div>
 <script>

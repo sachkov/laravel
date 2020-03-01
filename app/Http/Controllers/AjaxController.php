@@ -60,16 +60,16 @@ class AjaxController extends Controller
                 $offset = $request->input('offset');
 
             $prayers = $MN_model::where('author_id', Auth::user()->id)
-                ->select("mn.*");
+                //->select("mn.*");
+                ->select(DB::raw('mn.*, count(mn_group.by_admin) as by_admin'))
+                ->leftJoin('mn_group', 'mn.id', '=', 'mn_group.mn_id');
             // Применение фильтра личные/общие/все
             if($request->input('mode') != 'all'){
                 $public = null;
                 if($request->input('mode') == 'public')
                     $public = 1;
-                $prayers = $prayers->leftJoin('mn_group', 'mn.id', '=', 'mn_group.mn_id')
-                    ->where('mn_group.by_admin', $public);
+                $prayers = $prayers->where('mn_group.by_admin', $public);
             }
-
             $prayers = $prayers->groupBy('mn.id')
                 ->whereNull('no_active')
                 ->whereNull('end_date')
@@ -89,6 +89,9 @@ class AjaxController extends Controller
                     "description"=>$pr->description,
                     "answer"=>$pr->answer,
                     "is_thanks"=>$pr->answer_date?1:0,
+                    "by_admin"=>$pr->by_admin>0?1:0,
+                    "week_day"=>intdiv($pr->sсhedule, 100),
+                    "month_day"=>$pr->sсhedule%100,
                 ];
                 foreach($pr->signed_users as $user){
                     $r[] = ["name"=>$user->name, "id"=>$user->id];

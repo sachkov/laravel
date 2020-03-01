@@ -25,7 +25,23 @@ class HomeController extends Controller
      */
     public function index()
     {
-        return view('home');
+        /*
+        $MN_model = new \App\Models\MN;
+        $prayers = $MN_model::where('author_id', Auth::user()->id)
+                ->select(DB::raw('mn.*, count(mn_group.by_admin) as by_admin'));
+        $prayers = $prayers->leftJoin('mn_group', 'mn.id', '=', 'mn_group.mn_id');
+            //->where('mn_group.by_admin', 1);
+
+        $prayers = $prayers->groupBy('mn.id')
+            ->whereNull('no_active')
+            ->whereNull('end_date')
+            ->orderBy('updated_at', 'desc')
+            ->offset(0)
+            ->take(10)
+            ->get();
+        */
+        $prayers = intdiv(622, 100);
+        return view('home', ["ar"=>$prayers]);
     }
     
     /*
@@ -35,42 +51,7 @@ class HomeController extends Controller
     public function prayersList()
     {
         //DB::enableQueryLog(); //начать запись в лог
-        /*
-        $MN_model = new \App\Models\MN;
-        $MN = $MN_model
-            ->distinct()
-            ->leftJoin('mn_user__rs', 'mn.id', '=', 'mn_user__rs.mn_id')
-            ->leftJoin('mn_group', 'mn.id', '=', 'mn_group.mn_id')
-            ->select('mn.*')
-            //->where('author_id', '<>', Auth::user()->id)
-            ->whereNull('end_date')
-            ->whereNull('no_active')
-            ->where(function ($query) {
-                    $groups = [];
-                    $gr = DB::table('user_group')
-                        ->select("group_id")
-                        ->where('user_id', Auth::user()->id)
-                        ->get();
-                    foreach($gr as $group)
-                        $groups[] = $group->group_id;
-                    
-                    if(count($groups))
-                        $query->whereIn('mn_group.group_id', $groups)
-                            ->orWhere([
-                                    ['mn_user__rs.user_id', '=', Auth::user()->id],
-                                    ['author_id', '<>', Auth::user()->id]
-                                ]);
-                    else
-                        $query->where([
-                                ['mn_user__rs.user_id', '=', Auth::user()->id],
-                                ['author_id', '<>', Auth::user()->id]
-                            ]);
-                })
-            ->orderBy('mn.updated_at', 'desc')
-            ->take(30)
-            ->get();
-            */
-            //dd(DB::getQueryLog());  //вывод лога запроса
+        //dd(DB::getQueryLog());  //вывод лога запроса
         //return view('prayersList', ["arMN"=>$MN]);
 
         return view('prayersList');
