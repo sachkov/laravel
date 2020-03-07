@@ -23,7 +23,7 @@
             <div class="check_flex">
                 <label for="type-left" class="check radio-left active">
                     <input type="radio" id="type-left" name="radio" 
-                        v-model="mn_type" value=0>
+                        v-model="mn_type" value=0 hidden>
                     <span class="title">Личная</span>
                     <span class="descr">
                         Молитва, которую Вы добавляете от своего имени, 
@@ -32,7 +32,7 @@
                 </label>
                 <label for="type-right" class="check radio-right">
                     <input type="radio" id="type-right" name="radio"
-                        v-model="mn_type" value=1>
+                        v-model="mn_type" value=1 hidden>
                     <span class="descr">
                         Молитва, которую Вы добавляете как администратор группы, 
                         ею можно поделится только с группами.
@@ -53,7 +53,7 @@
             <input type="text" class="form-control" id="input-user" placeholder="Начните вводить имя или фамилию">
         </div>
 
-        <div class="form-group" v-show="!mn_type && is_groups_table">
+        <div class="form-group" v-show="is_groups_table">
             <label for="input-user">Видно группам</label>
             <div class="users-list">
                 <span class="users-list-text" v-for="(item,i) in add_groups_table">
@@ -61,9 +61,17 @@
                     <span class="x-del" @click="del_gr(i)">X</span>
                 </span>
             </div>
-            <input type="text" class="form-control" id="input-group" placeholder="Начните вводить название группы">
+            <?/*<input type="text" class="form-control" id="input-group" placeholder="Начните вводить название группы">*/?>
+            <select class="form-control" id="select-group" @change="add_gr($event)">
+                <option default>Выберите группу</option>
+                <option v-for="(x, index) in user_groups"
+                    :value="index">
+                    @{{x.label}}
+                </option>
+            </select>
         </div>
 
+        <?/*    //l-7
         <div class="form-group" v-show="mn_type">
             <label for="input-user">Видно группам</label>
             <div class="users-list">
@@ -79,15 +87,35 @@
                 </option>
             </select>
         </div>
+        */?>
+
+        <div class="form-group" v-show="mn_type && is_groups_table">
+            <label for="input-user">Показывать по графику</label>
+            <div class="select_flex">
+                <select class="form-control" id="week-day" v-model="week_day">
+                    <option v-for="(day, index) in week"
+                        :value="index">
+                        @{{day}}
+                    </option>
+                </select>
+                <select class="form-control" id="month-day" v-model="month_day">
+                    <option v-for="(day, index) in month"
+                        :value="index">
+                        @{{day}}
+                    </option>
+                </select>
+            </div>
+        </div>
         
         <div id="btn-save-mn" class="btn btn-success">Сохранить</div>
         <div id="btn-cancel-mn" class="btn btn-light">Отмена</div>
     </form>
+
     <div class="home-btns-add">
         <a class="btn btn-info" href="{{route('list')}}">Молитвы</a>
+        <i id="mode">Личные молитвы</i>
         <button type="button" id="btn-add-mn" class="btn btn-success">Добавить</button>
     </div>
-    
     
     <div id="main-table" class="prayers-main-table">
         <div class="tbody">
@@ -145,7 +173,8 @@
             <label for="result-edit">Результат</label>
             <textarea class="form-control" id="result-edit" rows="3" v-model.trim="edit.answer"></textarea>
         </div>
-        <div class="form-group" v-show="!edit.is_thanks">
+
+        <div class="form-group" v-show="!edit.is_thanks && !edit.by_admin">
             <label for="share-edit">Видно людям</label>
             <div class="users-list">
                 <span class="users-list-text" v-for="(item,i) in edit_users_table">
@@ -156,6 +185,7 @@
             <input type="text" class="form-control" 
                 id="share-edit" placeholder="Начните вводить имя или фамилию">
         </div>
+
         <div class="form-group" v-show="!edit.is_thanks && is_groups_table">
             <label for="share-edit">Видно группам</label>
             <div class="users-list">
@@ -164,9 +194,37 @@
                     <span class="x-del" @click="edit_del_gr(i)">X</span>
                 </span>
             </div>
+            <?/*
             <input type="text" class="form-control" 
                 id="groups-edit" placeholder="Начните вводить название группы">
+            */?>
+            <select class="form-control" id="edit-group" @change="edit_gr($event)">
+                <option default>Выберите группу</option>
+                <option v-for="(x, index) in user_groups"
+                    :value="index">
+                    @{{x.label}}
+                </option>
+            </select>
         </div>
+
+        <div class="form-group" v-show="!edit.is_thanks && edit.by_admin">
+            <label for="input-user">Показывать по графику</label>
+            <div class="select_flex">
+                <select class="form-control" id="week-day-edit" v-model="edit.week_day">
+                    <option v-for="(day, index) in week"
+                        :value="index">
+                        @{{day}}
+                    </option>
+                </select>
+                <select class="form-control" id="month-day-edit" v-model="edit.month_day">
+                    <option v-for="(day, index) in month"
+                        :value="index">
+                        @{{day}}
+                    </option>
+                </select>
+            </div>
+        </div>
+
         <div class="btn btn-primary" id="btn-save-edit">Сохранить</div>
         <div id="btn-cancel-edit" class="btn btn-light">Отмена</div>
     </div>
@@ -205,7 +263,9 @@
         </ul>
     </nav>
 
+    <pre><?//echo config('app.env');?></pre>
     <pre><?//print_r($ar);?></pre>
+
 </div>
 <script>
     let auth = true;
@@ -213,6 +273,12 @@
        auth = false; 
     <?}?>
 </script>
+@endsection
+
+@section('page_menu')
+    <span id="view_mode" class="list link" data-mode="personal">
+        Показать все
+    </span>
 @endsection
 
 @section('script')

@@ -1,15 +1,18 @@
 <!DOCTYPE html>
 <html lang="{{ app()->getLocale() }}">
 <head>
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-159083370-1"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-
-        gtag('config', 'UA-159083370-1');
-    </script>
+    
+    <?if(config('app.env') != "local"){?>
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-159083370-1"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('set', {'user_id': Auth::user()->id});
+            gtag('config', 'UA-159083370-1');
+        </script>
+    <?}?>
 
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -49,16 +52,14 @@
                         </div>
                         
                     </div>
-                    <label for="menu-checkbox">
-                        <img class="mobile-menu" src="/img/icons8-menu-filled.svg" alt="menu">
-                    </label>
-                    <input id="menu-checkbox" type="checkbox" style="display: none;"/>
+                    <img class="mobile-menu" src="/img/icons8-menu-filled.svg" alt="menu">
+                    
                     <div class="enter_link">
                         @if (Auth::guest())
                             <a class="list" href="{{ route('login') }}">Войти</a>
                             <a class="list" href="{{ route('register') }}">Зарегистрироваться</a>
                         @else
-                            <span class="list">{{ Auth::user()->name }}</span>
+                            <span class="list name">{{ Auth::user()->name }}</span>
                             <a class="list" href="{{route('home')}}">Мои нужды</a>
                             <a class="list" href="{{route('list')}}">Молитвы</a>
                             <a class="list" href="{{route('personal')}}">Личный кабинет</a>
@@ -67,9 +68,12 @@
                                 document.getElementById('logout-form').submit();">
                                 Выход
                             </a>
-                            <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                            <form id="logout-form" action="{{ route('logout') }}" method="POST">
                                 {{ csrf_field() }}
                             </form>
+                            <div class="page_menu">
+                            @yield('page_menu')
+                            </div>
                         @endif
                     </div>
                 </div>
@@ -92,6 +96,7 @@
     </div>
     <!-- Scripts -->
     <script src="{{ asset('js/app.js') }}"></script>
+    <script src="{{ asset('js/common.js') }}"></script>
     <!-- Custom scripts -->
     @yield('script')
      <!-- JQuery UI scripts -->

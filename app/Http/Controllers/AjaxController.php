@@ -15,6 +15,9 @@ class AjaxController extends Controller
         $this->middleware('auth');
     }
     
+    /**
+     * Создание молитвы
+     */
     public function saveMN(Request $request)
     {
         
@@ -24,6 +27,13 @@ class AjaxController extends Controller
             $MN_model->name = $request->input('name');
             $MN_model->description = $request->input('text');
             $MN_model->author_id = Auth::user()->id;
+            //Задание графика
+            $sсhedule = 0;
+            $week_day = intval($request->input('week_day'));
+            $month_day = intval($request->input('month_day'));
+            if($week_day) $sсhedule = $week_day*100;
+            if($month_day) $sсhedule += $month_day;
+            if($sсhedule) $MN_model->sсhedule = $sсhedule;
             $MN_model->save();
             $MN_model->signed_users()->sync(json_decode($request->input('users')));
             $arGroupsID = [];
@@ -45,26 +55,75 @@ class AjaxController extends Controller
         return response()->json( $out );
     }
     
+    /**
+     * Получение таблицы "моих молитв"
+     */
     public function getTable(Request $request)
     {
         if(Auth::check())
         {
-            $r = [];
-            $MN_model = new \App\Models\MN;
-            $offset = 0;
+            //Получаем ИД МН в которых пользователь - админ
+            $objMN = DB::table("user_group")
+                ->leftJoin("mn_group", 'user_group.group_id', "=", "mn_group.group_id")
+                ->select("mn_group.mn_id")
+                ->where("user_group.user_id", "=", Auth::user()->id)
+                ->where("user_group.admin", "=", 1)
+                ->get();
+            $arMNId = [];
+            foreach($objMN as $mn) $arMNId[] = $mn->mn_id;
+
+            $users = [];        //Массив с именами пользователей из списка МН
+            $groups = [];       //Массив с названиями групп из списка МН
+            $num = 15;          //Кол-во записей в выборке
+            $offset = 0;        //Номер страницы
             if($request->input('offset'))
                 $offset = $request->input('offset');
-            $prayers = $MN_model::where('author_id', Auth::user()->id)
-                ->whereNull('no_active')
-                ->whereNull('end_date')
-                ->orderBy('updated_at', 'desc')
+            
+            $sortBy = "all";    //Сортировка Все/личные/общие
+            if($request->input('mode') != '')
+                $sortBy = $request->input('mode');
+
+            $arGroupsId = [];           //массив групп где пользователь - админ
+            if($sortBy != "personal"){
+                $UG = DB::table("user_group")
+                    ->select("group_id")
+                    ->where("user_id", Auth::user()->id)
+                    ->where("admin", 1)
+                    ->get();
+                foreach($UG as $user) $arGroupsId[] = $user->group_id;
+            }
+
+            $MN_model = new \App\Models\MN;
+            $prayers = $MN_model::selectRaw('mn.*, count(mn_group.by_admin) as by_admin')
+                ->leftJoin('mn_group', function($join){
+                    $join->on('mn.id', '=', 'mn_group.mn_id')
+                        ->where('mn_group.by_admin', 1);
+                })
+                ->when(($sortBy=="all"), function ($query) use ($arGroupsId){
+                    return $query->where(function($q) use ($arGroupsId){
+                        $q->whereIn('mn_group.group_id', $arGroupsId)
+                            ->orWhere('mn.author_id', Auth::user()->id);
+                    });
+                }, function($query) use ($arGroupsId, $sortBy){
+                    if($sortBy == "personal")
+                        return $query->where('mn.author_id', Auth::user()->id)
+                                    ->whereNull('mn_group.by_admin');
+                    else
+                        return $query->whereIn('mn_group.group_id', $arGroupsId);
+                })
+                ->whereNull('mn.no_active')
+                ->whereNull('mn.end_date')
+                ->groupBy('mn.id')
+                ->orderBy('mn.updated_at', 'desc')
                 ->offset($offset)
-                ->take(10)
+                ->take($num)
                 ->get();
+            
             $table = [];
+            $count = 0;
             foreach($prayers as $k=>$pr){
-                $r = [];
-                $g = [];
+                $users = [];
+                $groups = [];
                 $table[$k] = [
                     "id"=>$pr->id,
                     "name"=>$pr->name,
@@ -72,22 +131,25 @@ class AjaxController extends Controller
                     "description"=>$pr->description,
                     "answer"=>$pr->answer,
                     "is_thanks"=>$pr->answer_date?1:0,
+                    "by_admin"=>$pr->by_admin>0?1:0,
+                    "week_day"=>intdiv($pr->sсhedule, 100),
+                    "month_day"=>$pr->sсhedule%100,
                 ];
                 foreach($pr->signed_users as $user){
-                    $r[] = ["name"=>$user->name, "id"=>$user->id];
+                    $users[] = ["name"=>$user->name, "id"=>$user->id];
                 }
                 foreach($pr->signed_groups as $group){
-                    $g[] = ["name"=>$group->name, "id"=>$group->id];
+                    $groups[] = ["name"=>$group->name, "id"=>$group->id];
                 }
                 $table[$k]["author"] = ["name"=>$pr->author->name, "email"=>$pr->author->email];
-                $table[$k]["users"] = $r;
-                $table[$k]["groups"] = $g;
+                $table[$k]["users"] = $users;
+                $table[$k]["groups"] = $groups;
+                $count++;
             }
-            $count = $MN_model::where('author_id', Auth::user()->id)
-                ->whereNull('end_date')
-                ->count();
+            $end = true;
+            if($count==$num)$end = false;
             
-            $res = ["table"=>$table, "count"=>$count];
+            $res = ["table"=>$table, "end"=>$end];
         } 
         else {
             $res['error'] = 'У вас нет доступа';
@@ -96,6 +158,9 @@ class AjaxController extends Controller
         return json_encode($res);
     }
     
+    /**
+     * Получение списка пользователей
+     */
     public function getUsers(Request $request)
     {
         if(Auth::check())
@@ -114,6 +179,9 @@ class AjaxController extends Controller
         return json_encode($res);
     }
     
+    /**
+     * Редактирование молитвы
+     */
     public function editMN(Request $request)
     {
         if(Auth::check() && $request->input('id')){
@@ -121,6 +189,13 @@ class AjaxController extends Controller
             $MN_model->name = $request->input('name');
             $MN_model->description = $request->input('text');
             $MN_model->answer = $request->input('result');
+            //Задание графика
+            $sсhedule = 0;
+            $week_day = intval($request->input('week_day'));
+            $month_day = intval($request->input('month_day'));
+            if($week_day) $sсhedule = $week_day*100;
+            if($month_day) $sсhedule += $month_day;
+            if($sсhedule) $MN_model->sсhedule = $sсhedule;
             $MN_model->save();
             $MN_model->signed_users()->sync(json_decode($request->input('users')));
             $MN_model->signed_groups()->sync(json_decode($request->input('groups')));
@@ -195,7 +270,7 @@ class AjaxController extends Controller
     {
         $groups = [];
         $authors = [];
-        $arG = [];
+        $arG = [];  //Суммарная таблица молитвы от людей и групп
         $admin = [];
         $num = 30;  //сколько записей получаем за раз
 
@@ -212,9 +287,6 @@ class AjaxController extends Controller
                 $str = $group->name;
             $groups[$group->group_id] = $str;
         }
-
-// !!!!!!! Добавить where('mn.updated_at', '>', $last_date) !!!!!!!!
-// !!!!!!! ->where("updated_at", ">", "2020-02-01 00:00:00") !!!!!!!
         
         $updated_at = "2040-01-01 00:00:00";    //1577822400
         if( $request->input('last_date')
@@ -231,6 +303,12 @@ class AjaxController extends Controller
             ->whereNull('no_active')
             ->whereNull('end_date')
             ->where("mn.updated_at", "<", $updated_at)
+            ->where(function($q){
+                $q->whereNull("mn.sсhedule")
+                    ->orWhere("mn.sсhedule", date('N')*100)
+                    ->orWhere("mn.sсhedule", date('w')*100+date('j'))
+                    ->orWhere("mn.sсhedule", date('j'));
+            })
             ->take($num)
             ->orderBy('mn.updated_at', 'desc')
             ->get()->toArray();
@@ -250,8 +328,6 @@ class AjaxController extends Controller
         foreach($groups_id as $mn){
             $arG[$mn->id][] = $mn->group_id;
             $authors[] = $mn->author_id;
-            if($mn->by_admin)
-                $admin[] = $mn->id;
         }
 
         foreach($users as $umn){
@@ -274,7 +350,7 @@ class AjaxController extends Controller
             ->orderBy('updated_at', 'desc')
             ->get();
             
-        $objMN2 = $objMN->transform(function ($item, $key) {
+        $objMN_transform = $objMN->transform(function ($item, $key) {
             $item->diff = $this->humanDate($item->updated_at);
             return $item;
         });
@@ -283,7 +359,7 @@ class AjaxController extends Controller
             "groups"=>$groups, 
             "authors"=>$arAuthors,
             "mn_groups"=>$arG,
-            "MN"=>$objMN2,
+            "MN"=>$objMN_transform,
             "admin"=>$admin,
         ] );
     }

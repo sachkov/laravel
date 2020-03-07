@@ -10,13 +10,17 @@ var vm = new Vue({
         is_thanks: 0,           // Является ли нужда - благодарностью
         is_groups_table: false, // Состоит ли пользователь в группах
         add_groups_table: [],   // Список групп при добавлении мн
-        add_adm_groups_table: [], //Список админ групп при добавлении мн
+        //add_adm_groups_table: [], //Список админ групп при добавлении мн //l-7
         edit_groups_table: [],  // Список групп при редактировании мн
         active_index: 0,        // индекс элемента списка, на котором открыли меню
         mn_type: 0,             // тип добавляемой нужды (личная/от админа)
 
         user_groups: [],    //Группы, в которых состоит пользователь
-        admin_groups: [],   //Группы в которых автор - админ
+        //admin_groups: [],   //Группы в которых автор - админ  //l-7
+        week: ["День недели", 'Понедельник', 'Вторник', 'Среда', 'Четверг',
+                 'Пятница', 'Суббота', 'Воскресенье'],
+        week_day: 0,
+        month_day: 0,
     },
     methods:{
         del: function(a){
@@ -81,7 +85,7 @@ var vm = new Vue({
             vm.edit_groups_table.splice(a,1); 
         },
         // удаление админ группы в форме добавления МН
-        del_adm_gr: function(a){
+        /*del_adm_gr: function(a){  //l-7
             vm.add_adm_groups_table.splice(
                 vm.add_adm_groups_table.indexOf(a),
                 1
@@ -96,8 +100,39 @@ var vm = new Vue({
         edit_adm_gr: function(gr){
             if(vm.edit_groups_table.indexOf(gr) == -1)
                 vm.edit_groups_table.push(gr);
+        },*/
+        // добавление группы в форме добавления МН //l-7-2
+        add_gr: function(event){          
+            if(
+                vm.add_groups_table.
+                indexOf(vm.user_groups[event.target.value]) == -1
+            )
+                vm.add_groups_table.push(vm.user_groups[event.target.value]);
+            
+            $('#select-group').prop('selected', function() {
+                return this.defaultSelected;
+            });
+        },
+        // добавление группы в форме редактирования МН //l-7-2
+        edit_gr: function(gr){
+            if(
+                vm.edit_groups_table.
+                indexOf(vm.user_groups[event.target.value]) == -1
+            )
+                vm.edit_groups_table.push(vm.user_groups[event.target.value]);
+            
+            $('#edit-group').prop('selected', function() {
+                return this.defaultSelected;
+            });
         },
     },
+    computed: {
+        month: function(){
+            var ar = ["День месяца"];
+            for(i=1;i<32;i++) ar.push(i);
+            return ar; 
+        },
+    }
 });
 
 var arUsers = {}; //Список всех пользователей
@@ -128,6 +163,7 @@ $( document ).ready(function(){
             vm.active_index = 0;
         }
     });
+
     //Нажатие на "Добавить"
     $("#btn-add-mn").on("click",function(){
         $(this).parent().hide();
@@ -148,7 +184,10 @@ $( document ).ready(function(){
         $("#input-user").val("");
         vm.add_users_table = [];
         vm.add_groups_table = [];
-        vm.add_adm_groups_table = [];
+        vm.mn_type = 0;
+        vm.week_day = 0;
+        vm.month_day = 0;
+        //vm.add_adm_groups_table = []; //l-7
         $("#main-table").show();
     });
     
@@ -175,6 +214,26 @@ $( document ).ready(function(){
             $("#desc-"+$(this).parents(".t-tr").data("mnid")).show();
         }
     });
+
+    //Нажатие на пункт меню Показать (личные->все->общие)
+    
+    $("#view_mode").on("click", function(){
+        if($(this).data("mode") == "personal"){
+            mode = "all";
+            $(this).html("Показать общие");
+            $("#mode").html("Все молитвы");
+        }else if($(this).data("mode") == "all"){
+            mode = "public";
+            $(this).html("Показать личные");
+            $("#mode").html("Общие молитвы");
+        }else if($(this).data("mode") == "public"){
+            mode = "personal";
+            $(this).html("Показать все");
+            $("#mode").html("Личные молитвы");
+        }
+        $(this).data("mode", mode);
+        getTable(0);
+    });
 });
 
 function getTable(offset = 0){
@@ -186,7 +245,8 @@ function getTable(offset = 0){
                 'X-CSRF-TOKEN': $('#x_token').val()
             },
         data: {
-            offset: offset
+            offset: offset,
+            mode: $("#view_mode").data("mode"),
         },
         success: function(data){
             if(!data.table && !data.count){
@@ -199,10 +259,10 @@ function getTable(offset = 0){
                     vm.mainTable.push(data.table[x]);
             }else vm.mainTable = data.table;
                 
-            if(data.count && vm.mainTable.length < data.count){
-                $("#more_btn").show();
-            }else{
+            if(data.end){
                 $("#more_btn").hide();
+            }else{
+                $("#more_btn").show();
             }
         },
         error: function(data) {
@@ -225,7 +285,7 @@ function getUsers(){
             for(x in data){
                 arUsers.push({label: data[x], value:x});
             }
-            console.log(arUsers);
+            //console.log(arUsers);
             $("#input-user").autocomplete({
                 minLength: 1,
                 source: arUsers,
@@ -270,7 +330,7 @@ function saveMN(){
         res.push(vm.add_users_table[i].value);
     }
     
-    if(vm.mn_type){
+    /*if(vm.mn_type){       //l-7
         for(i in vm.add_adm_groups_table){
             resG.push(vm.add_adm_groups_table[i].id);
         }
@@ -278,7 +338,11 @@ function saveMN(){
         for(i in vm.add_groups_table){
             resG.push(vm.add_groups_table[i].value);
         }
+    }*/
+    for(i in vm.add_groups_table){
+        resG.push(vm.add_groups_table[i].value);
     }
+
     //отправка ajax
     $.ajax({
         type: "POST",
@@ -294,6 +358,8 @@ function saveMN(){
             by_admin: vm.mn_type,
             users: JSON.stringify(res),
             groups: JSON.stringify(resG),
+            week_day: vm.week_day,
+            month_day: vm.month_day,
         },
         success: function(data){
             $("#create-form").hide();
@@ -302,7 +368,10 @@ function saveMN(){
             $("#textarea-descr").val("");
             vm.add_users_table = [];
             vm.add_groups_table = [];
-            vm.add_adm_groups_table = [];
+            vm.mn_type = 0;
+            vm.week_day = 0;
+            vm.month_day = 0;
+            //vm.add_adm_groups_table = []; //l-7
             getTable();
             $("#main-table").show();
         },
@@ -419,6 +488,8 @@ function editMN(){
             result: vm.edit.answer,
             users: JSON.stringify(resU),
             groups: JSON.stringify(resG),
+            week_day: vm.edit.week_day,
+            month_day: vm.edit.month_day,
         },
         success: function(data){
             //Изменение значений в таблице и закрытие формы редактирования
@@ -501,19 +572,16 @@ function fillAutocomplite(groups){
                 label: groups[x].name,
                 value: groups[x].id
             });
-            if(groups[x].admin)
+            /*if(groups[x].admin)       //l-7
             vm.admin_groups.push({
                 name: groups[x].name,
                 id: groups[x].id
-            });
-            /*$("#input-adm-group").append(
-                '<option value="'+groups[x].id+
-                '">'+groups[x].name+'</option>'
-            );*/
+            });*/
         }
     }
     
     vm.is_groups_table = table.length > 0;
+    /*  //l-7-2
     $('#input-group').autocomplete({
         minLength: 1,
         source: table,
@@ -524,9 +592,9 @@ function fillAutocomplite(groups){
         change: function( event, ui ) {
             $("#input-group").val("");
         }
-    });
-    $('#input-group').addClass("test");
+    });*/
     //console.log(table);
+    /*  //l-7-2
     $('#groups-edit').autocomplete({
         minLength: 1,
         source: table,
@@ -540,7 +608,7 @@ function fillAutocomplite(groups){
         change: function( event, ui ) {
             $("#groups-edit").val("");
         }
-    });
+    });*/
 }
 
 /*

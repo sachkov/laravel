@@ -1,5 +1,9 @@
+body{
+    overflow-x: hidden;
+}
 .main-section{
     min-height: calc(100vh - 270px);
+    padding-top: 30px;
 }
 /*Drop-down menu*/
 .list-item .drop-down-menu{
@@ -154,18 +158,23 @@
     display: inline-flex;
     font-weight: 400;
     text-align: center;
-    vertical-align: middle;
     font-size: 1rem;
     color: white;
     height: 70px;
 }
 .check_flex .check .title,
 .check_flex .check .descr{
-    display: flex;
-    align-items: center;
     padding: 5px;
     line-height: 1;
     height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.check_flex .check .descr{
+    display: none;
+    padding: 0;
+    font-size: .8rem;
 }
 .check_flex .check.radio-left .title{
     background-color: green;
@@ -187,7 +196,7 @@
     left: 100%;
     border-radius: 5px 0 0 5px;
 }
-.check_flex .check input{display: none;}
+
 .check_flex .check.radio-left input:checked ~ .title{
     border-radius: 5px 0 0 5px;
     border: 2px solid red;
@@ -203,6 +212,7 @@
     right: auto;
     left: auto;
     position: relative;
+    display: flex;
 }
 .check_flex .check.radio-left input:checked ~ .descr{
     border: 2px solid red;
@@ -212,13 +222,12 @@
     border: 2px solid red;
     border-right: none;
 }
-.check_flex .check .descr{
-    padding: 0;
-    font-size: .8rem;
-    position: absolute;
-}
+
 @media (min-width:576px){
-    .check_flex .check{height: 30px;}
+    .check_flex .check{height: 40px;}
+}
+.select_flex{
+    display: flex;
 }
 /*prayers end*/
 
@@ -401,8 +410,29 @@
     font-weight: 300;
     text-decoration: none;
 }
+.header-first-line .enter_link .link{
+    cursor: pointer;
+}
 .header-first-line .mobile-menu{
     display: none;
+}
+.header-first-line .enter_link .page_menu{
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    top: 90px;
+    left: 0;
+    right: 0;
+    background-color: #FFFFCC;
+}
+.header-first-line .enter_link .page_menu .list{
+    padding: 0 20px;
+    border: 1px solid transparent;
+    border-radius: 5px;
+}
+.header-first-line .enter_link .page_menu .list:hover{
+    border-color: grey;
 }
 
 .content-block{
@@ -475,6 +505,9 @@ footer .footer .contacts{
 @media (max-width:768px){
     .main-section{min-height: calc(100vh - 200px);}
     .header-first-line, .header-piсture{height: 80px;}
+    .header-first-line .enter_link .page_menu{
+        top: 80px;
+    }
     .header-logo{ width: 285px; height: 60px;}
     .header-first-line .enter_link{
         width: calc(100% - 285px);
@@ -539,9 +572,12 @@ footer .footer .contacts{
 @media (max-width:600px){
     .header-first-line .enter_link .list{font-size: 16px;}
 }
-@media (max-width:480px){
+@media (max-width:480px){       /*MOBILE*/
     body{font-size: 14px;}
-    .main-section{min-height: calc(100vh - 200px);}
+    .main-section{
+        min-height: calc(100vh - 200px);
+        padding-top: 10px;
+    }
     .header-first-line, .header-piсture{height: 70px;}
     .header-first-line{justify-content: space-between;}
     .header-logo{ width: 250px; height: 50px;}
@@ -556,20 +592,57 @@ footer .footer .contacts{
     }
     .header-first-line nav{display: none;}
     .header-first-line .enter_link{
+        min-width: 170px;
+        max-width: 65%;
         width: auto;
-        height: auto;
+        height: calc(100vh - 70px);
         align-items: center;
+        justify-content: start;
         flex-direction: column;
         position: absolute;
-        top: -200px;
-        right: 0;
-        transition: top 500ms ease-in;
+        top: 70px;
+        right: -100%;
+        bottom: 0;
+        transition: right 500ms ease-out;
         display: flex;
-        background-color: DarkKhaki;
+        background-color: Wheat;
+        margin: 0;
+        padding: 10px 5px;
     }
-    #menu-checkbox:checked + .enter_link{top: 70px;}
-
-    .header-first-line .mobile-menu{display: block; margin-right: 10px;}
+    .header-first-line .enter_link.show{
+        right: 0;
+    }
+    .header-first-line .enter_link .name{
+        font-weight: bold;
+        font-style: italic;
+    }
+    .header-first-line .enter_link .list{
+        line-height: 2;
+    }
+    #logout-form{
+        display: block;
+        margin-top: 10px;
+    }
+    .header-first-line .enter_link .link{
+        cursor: pointer;
+    }
+    
+    .header-first-line .enter_link .page_menu{
+        border-top: 3px solid grey;
+        padding-top: 10px;
+        position: static;
+        display: flex;
+        flex-direction: column;
+        background-color: transparent;
+    }
+    .header-first-line .enter_link .page_menu .list{
+        padding: 5px 7px;
+    }
+    .header-first-line .mobile-menu{
+        display: block;
+        margin-right: 10px;
+        cursor: pointer;
+    }
 
     .header-piсture .quote{width: 200px;top: 90px;right: 50px;font-size: 14px;}
     .News h3, .Calendar h3, .Location h3, .feedback-form h3, .aboutCherch h3{font-size: 20px; }
