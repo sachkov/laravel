@@ -9,7 +9,7 @@
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
-            gtag('set', {'user_id': Auth::user()->id});
+            gtag('set', {'user_id': {{Auth::user()->id}} });
             gtag('config', 'UA-159083370-1');
         </script>
     <?}?>
