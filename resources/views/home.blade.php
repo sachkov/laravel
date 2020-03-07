@@ -110,11 +110,12 @@
         <div id="btn-save-mn" class="btn btn-success">Сохранить</div>
         <div id="btn-cancel-mn" class="btn btn-light">Отмена</div>
     </form>
+
     <div class="home-btns-add">
         <a class="btn btn-info" href="{{route('list')}}">Молитвы</a>
+        <i id="mode">Личные молитвы</i>
         <button type="button" id="btn-add-mn" class="btn btn-success">Добавить</button>
     </div>
-    
     
     <div id="main-table" class="prayers-main-table">
         <div class="tbody">
@@ -209,13 +210,13 @@
         <div class="form-group" v-show="!edit.is_thanks && edit.by_admin">
             <label for="input-user">Показывать по графику</label>
             <div class="select_flex">
-                <select class="form-control" id="week-day" v-model="week_day_edit">
+                <select class="form-control" id="week-day-edit" v-model="edit.week_day">
                     <option v-for="(day, index) in week"
                         :value="index">
                         @{{day}}
                     </option>
                 </select>
-                <select class="form-control" id="month-day" v-model="month_day_edit">
+                <select class="form-control" id="month-day-edit" v-model="edit.month_day">
                     <option v-for="(day, index) in month"
                         :value="index">
                         @{{day}}
@@ -263,7 +264,7 @@
     </nav>
 
     <pre><?//echo config('app.env');?></pre>
-    <pre><?//var_dump($ar);?></pre>
+    <pre><?//print_r($ar);?></pre>
 
 </div>
 <script>

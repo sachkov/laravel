@@ -10,16 +10,9 @@ $( document ).ready(function(){
         if($("#group-name").val() != "")
             createGroup();
     });
-    // присоединится к группе
-    $("#come-in-group").on("click", function(){
-        if($(this).hasClass("act")){
-            addUser();
-        }
-    });
     if($("#v-personal-groups").length){
         getGroups();
     }
-        
 });
 
 /*
@@ -88,53 +81,22 @@ let vm = new Vue({
     el: '#v-personal-groups',
     data: {
         group_table: [],
-        arGroupNames: [],  //массив имен групп для оприделения изменено ли значение
+        groups_available: [],   //Доступные для вступления группы
+        selected_group: 0,
     },
     methods: {
-        /*leave: function(group_indx){
-            globalAjax(
-                "/personal/leaveGroup",
-                {group: vm.group_table[group_indx].id},
-                function(data){
-                    vm.group_table.splice(group_indx,1);
-                    //location.reload();
-                },
-                ()=>{}
-            );
-        },
-        del_group: function(group_indx){
-            globalAjax(
-                "/personal/delGroup",
-                {group: vm.group_table[group_indx].id},
-                function(data){
-                    if(data.success)
-                        vm.group_table.splice(group_indx,1);
-                },
-                ()=>{}
-            );
-        },*/
-        /*saveName: function(group_indx){
-            vm.arGroupNames[group_indx] = 
-                vm.group_table[group_indx].name;
-        },
-        changeName: function(group_indx){
-            if(vm.group_table[group_indx].name !=
-                vm.arGroupNames[group_indx]
-            ){
-                globalAjax(
-                    "/personal/changeGroupName",
-                    {
-                        name: vm.group_table[group_indx].name,
-                        id: vm.group_table[group_indx].id
-                    },
-                    function(data){
-                        console.log(data);
-                    },
-                    ()=>{}
-                );
+        selectGroup: function(){
+            if(vm.selected_group && vm.selected_group != "0"){
+                $("#come-in-group").addClass("act");
+            }else{
+                $("#come-in-group").removeClass("act");
             }
-            
-        },*/
+        },
+        addUser: function(){
+            if($("#come-in-group").hasClass("act")){
+                addUser();
+            }
+        },
     }
 });
 
@@ -146,6 +108,8 @@ function fillTable(groups){
     for(x in groups){
         if(groups[x].is_member){
             vm.group_table.push(groups[x]);
+        }else{
+            vm.groups_available.push(groups[x]);
         }
     }
 }
@@ -173,7 +137,6 @@ function getGroups(){
                 //console.table(data.groups);
                 allGroups = data.groups;
                 fillTable(data.groups);
-                fillAutocomplite(data.groups);
             }catch{
                 console.log("getGroups data error!");
             }
@@ -188,21 +151,14 @@ function getGroups(){
 *   Присоединить пользователя к существующей группе
 */
 function addUser(){
-
-    if(!selected_group_id) return false;
+    let id = $("#select-group").val();
+    if(!id) return false;
 
     globalAjax(
         "/personal/addUser",
-        {group: selected_group_id},
+        {group: id},
         function(data){
-            //location.reload();
-            for(x in allGroups)
-                if(allGroups[x].id == selected_group_id)
-                    break;
-            if(data.error == undefined)
-                vm.group_table.push(allGroups[x]);
-            $("#come-in-group").removeClass("act");
-            $("#select-group").val("");
+            location.reload(true);
         },
         function(){}
     );
@@ -268,36 +224,4 @@ function del_admin(group_id, user_id){
             location.reload(true);},
         ()=>{location.reload(true);}
     );
-}
-
-/*
-*   Наполнение автокомплита для поиска существующих групп
-*/
-function fillAutocomplite(groups){
-    let data = [];
-    for(x in groups){
-        if(!groups[x].is_member){
-            data.push({
-                'value': groups[x].id,
-                'label':groups[x].name+'('+groups[x].number+')'
-            });
-        }
-    }
-    $('#select-group').autocomplete({
-        minLength: 1,
-        source: data,
-        select: function( event, ui ) {
-            //console.log(ui.item);
-            selected_group_id = ui.item.value;
-            $('#select-group').val(ui.item.label);
-            $("#come-in-group").addClass("act");
-            return false;
-        },
-        change: function( event, ui ) {
-            if(ui.item == null){
-                $("#come-in-group").removeClass("act");
-                selected_group_id = 0;
-            }
-        }
-    });
 }

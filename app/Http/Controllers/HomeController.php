@@ -25,23 +25,51 @@ class HomeController extends Controller
      */
     public function index()
     {
+        //Получаем ИД МН в которых пользователь - админ
         /*
-        $MN_model = new \App\Models\MN;
-        $prayers = $MN_model::where('author_id', Auth::user()->id)
-                ->select(DB::raw('mn.*, count(mn_group.by_admin) as by_admin'));
-        $prayers = $prayers->leftJoin('mn_group', 'mn.id', '=', 'mn_group.mn_id');
-            //->where('mn_group.by_admin', 1);
-
-        $prayers = $prayers->groupBy('mn.id')
-            ->whereNull('no_active')
-            ->whereNull('end_date')
-            ->orderBy('updated_at', 'desc')
-            ->offset(0)
-            ->take(10)
+        $UG = DB::table("user_group")
+            ->select("group_id")
+            ->where("user_id", Auth::user()->id)
+            ->where("admin", 1)
             ->get();
-        */
-        $prayers = intdiv(622, 100);
-        return view('home', ["ar"=>$prayers]);
+        $arGroupsId = [];
+        foreach($UG as $user) $arGroupsId[] = $user->group_id;
+
+        $r = [];
+        $num = 10;          //Кол-во записей в выборке
+        $offset = 0;
+        $MN_model = new \App\Models\MN;
+
+        $sortBy = "personal";
+        
+        //DB::enableQueryLog(); //начать запись в лог
+        $prayers = $MN_model::selectRaw('mn.*, count(mn_group.by_admin) as by_admin')
+            ->leftJoin('mn_group', function($join){
+                $join->on('mn.id', '=', 'mn_group.mn_id')
+                    ->where('mn_group.by_admin', 1);
+            })
+            ->when(($sortBy=="all"), function ($query) use ($arGroupsId){
+                return $query->where(function($q) use ($arGroupsId){
+                    $q->whereIn('mn_group.group_id', $arGroupsId)
+                        ->orWhere('mn.author_id', Auth::user()->id);
+                });
+            }, function($query) use ($arGroupsId, $sortBy){
+                if($sortBy == "personal")
+                    return $query->where('mn.author_id', Auth::user()->id)
+                                ->whereNull('mn_group.by_admin');
+                else
+                    return $query->whereIn('mn_group.group_id', $arGroupsId);
+            })
+            ->whereNull('mn.no_active')
+            ->whereNull('mn.end_date')
+            ->groupBy('mn.id')
+            ->orderBy('mn.updated_at', 'desc')
+            ->offset($offset)
+            ->take(30)
+            ->get();
+            */
+        //dd(DB::getQueryLog());  //вывод лога запроса
+        return view('home');
     }
     
     /*

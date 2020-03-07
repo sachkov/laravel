@@ -27,15 +27,23 @@
             </div>
         </div>
 
-        <h4 class="my_groups">Поиск группы</h4>
-        <div class="form-group">
-            <input type="text" class="form-control" id="select-group" 
-                placeholder="Начинайте вводить название группы">
+        <div v-if="groups_available.length">
+            <h4 class="my_groups">Поиск группы</h4>
+            <div class="form-group">
+                <select class="form-control" id="select-group"
+                    @change="selectGroup()" v-model="selected_group">
+                    <option default value=0>Выберите группу</option>
+                    <option v-for="group in groups_available"
+                        :value="group.id">
+                        @{{group.name}}
+                    </option>
+                </select>
+            </div>
+            <button class="personal-btn disable" id="come-in-group" @click="addUser()">
+                <span class="d-screen">Присоединится</span>
+                <span class="d-mobile">&nbsp;</span>
+            </button>
         </div>
-        <button class="personal-btn disable" id="come-in-group">
-            <span class="d-screen">Присоединится</span>
-            <span class="d-mobile">&nbsp;</span>
-        </button>
 
         <h4 class="my_groups">Создать новую группу</h4>
         <div class="form-group">

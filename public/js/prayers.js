@@ -21,8 +21,6 @@ var vm = new Vue({
                  'Пятница', 'Суббота', 'Воскресенье'],
         week_day: 0,
         month_day: 0,
-        week_day_edit: 0,
-        month_day_edit: 0,
     },
     methods:{
         del: function(a){
@@ -187,6 +185,8 @@ $( document ).ready(function(){
         vm.add_users_table = [];
         vm.add_groups_table = [];
         vm.mn_type = 0;
+        vm.week_day = 0;
+        vm.month_day = 0;
         //vm.add_adm_groups_table = []; //l-7
         $("#main-table").show();
     });
@@ -221,19 +221,18 @@ $( document ).ready(function(){
         if($(this).data("mode") == "personal"){
             mode = "all";
             $(this).html("Показать общие");
-            $(this).data("mode", mode);
-            getTable(0);
+            $("#mode").html("Все молитвы");
         }else if($(this).data("mode") == "all"){
             mode = "public";
             $(this).html("Показать личные");
-            $(this).data("mode", mode);
-            getTable(0);
+            $("#mode").html("Общие молитвы");
         }else if($(this).data("mode") == "public"){
             mode = "personal";
             $(this).html("Показать все");
-            $(this).data("mode", mode);
-            getTable(0);
+            $("#mode").html("Личные молитвы");
         }
+        $(this).data("mode", mode);
+        getTable(0);
     });
 });
 
@@ -359,6 +358,8 @@ function saveMN(){
             by_admin: vm.mn_type,
             users: JSON.stringify(res),
             groups: JSON.stringify(resG),
+            week_day: vm.week_day,
+            month_day: vm.month_day,
         },
         success: function(data){
             $("#create-form").hide();
@@ -368,6 +369,8 @@ function saveMN(){
             vm.add_users_table = [];
             vm.add_groups_table = [];
             vm.mn_type = 0;
+            vm.week_day = 0;
+            vm.month_day = 0;
             //vm.add_adm_groups_table = []; //l-7
             getTable();
             $("#main-table").show();
@@ -485,6 +488,8 @@ function editMN(){
             result: vm.edit.answer,
             users: JSON.stringify(resU),
             groups: JSON.stringify(resG),
+            week_day: vm.edit.week_day,
+            month_day: vm.edit.month_day,
         },
         success: function(data){
             //Изменение значений в таблице и закрытие формы редактирования
