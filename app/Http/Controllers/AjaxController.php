@@ -62,16 +62,6 @@ class AjaxController extends Controller
     {
         if(Auth::check())
         {
-            //Получаем ИД МН в которых пользователь - админ
-            $objMN = DB::table("user_group")
-                ->leftJoin("mn_group", 'user_group.group_id', "=", "mn_group.group_id")
-                ->select("mn_group.mn_id")
-                ->where("user_group.user_id", "=", Auth::user()->id)
-                ->where("user_group.admin", "=", 1)
-                ->get();
-            $arMNId = [];
-            foreach($objMN as $mn) $arMNId[] = $mn->mn_id;
-
             $users = [];        //Массив с именами пользователей из списка МН
             $groups = [];       //Массив с названиями групп из списка МН
             $num = 15;          //Кол-во записей в выборке
@@ -127,7 +117,8 @@ class AjaxController extends Controller
                 $table[$k] = [
                     "id"=>$pr->id,
                     "name"=>$pr->name,
-                    "created_at"=>$pr->created_at->format('d.m.Y'),
+                    //"created_at"=>$pr->created_at->format('d.m.Y'),
+                    "created_at"=>$this->humanDate($pr->created_at),
                     "description"=>$pr->description,
                     "answer"=>$pr->answer,
                     "is_thanks"=>$pr->answer_date?1:0,
@@ -149,7 +140,7 @@ class AjaxController extends Controller
             $end = true;
             if($count==$num)$end = false;
             
-            $res = ["table"=>$table, "end"=>$end];
+            $res = ["table"=>$table, "end"=>$end, "admin"=>(count($arGroupsId)>0)];
         } 
         else {
             $res['error'] = 'У вас нет доступа';
@@ -366,18 +357,18 @@ class AjaxController extends Controller
 
     private function humanDate($uDate){
         $months = [
-            1=>"января",
-            2=>"февраля",
-            3=>"марта",
-            4=>"апреля",
+            1=>"янв",
+            2=>"февр",
+            3=>"мар",
+            4=>"апр",
             5=>"мая",
             6=>"июня",
             7=>"июля",
-            8=>"августа",
-            9=>"сентября",
-            10=>"октября",
-            11=>"ноября",
-            12=>"декабря",
+            8=>"авг",
+            9=>"сент",
+            10=>"окт",
+            11=>"нояб",
+            12=>"дек",
         ];
         $text = "";
         $now = Carbon::now();
@@ -392,7 +383,7 @@ class AjaxController extends Controller
         }elseif($diff < 10){
             $text .= $diff." дней назад";
         }elseif($D->year != $now->year){
-            $text .= $D->day." ".$months[$D->month]." ".$D->year ;
+            $text .= $D->day." ".$months[$D->month]."'".$D->format('y') ;
         }else{
             $text .= $D->day." ".$months[$D->month];
         }
