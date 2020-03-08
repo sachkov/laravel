@@ -114,10 +114,10 @@ var vm = new Vue({
             });
         },
         // добавление группы в форме редактирования МН //l-7-2
-        edit_gr: function(gr){
+        edit_gr: function(event){
             if(
                 vm.edit_groups_table.
-                indexOf(vm.user_groups[event.target.value]) == -1
+                 indexOf(vm.user_groups[event.target.value]) == -1
             )
                 vm.edit_groups_table.push(vm.user_groups[event.target.value]);
             

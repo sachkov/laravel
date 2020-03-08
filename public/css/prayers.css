@@ -604,13 +604,14 @@ footer .footer .contacts{
         right: -100%;
         bottom: 0;
         transition: right 500ms ease-out;
-        display: flex;
+        display: none;
         background-color: Wheat;
         margin: 0;
         padding: 10px 5px;
     }
     .header-first-line .enter_link.show{
         right: 0;
+        display: flex;
     }
     .header-first-line .enter_link .name{
         font-weight: bold;
