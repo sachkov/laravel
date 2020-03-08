@@ -387,4 +387,22 @@ class PersonalController extends Controller
             
         return "Обновление успешно.";
     }
+
+    /**
+     * Список всех пользователей на сайте
+     */
+    public function usersList($count = 3)
+    {
+        $User = new User;
+        $users = User::select('id', 'name', 'created_at')
+            ->orderBy('id', 'desc')
+            ->take($count)
+            ->get();
+
+        $link = null;
+        if(count($users) == $count)
+            $link = route('usersList',["count"=>$count+100]);
+        
+        return view("personal.usersList", ["users"=>$users, "nextLink"=>$link]);
+    }
 }

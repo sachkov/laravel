@@ -264,6 +264,12 @@ function getTable(offset = 0){
             }else{
                 $("#more_btn").show();
             }
+            //Если пользователь не админ в какой-то группе то 
+            //он видит только личные нужды
+            if(!data.admin){
+                $("#view_mode").hide();
+                $('#mode').hide();
+            }
         },
         error: function(data) {
             console.log("error");

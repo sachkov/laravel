@@ -59,6 +59,8 @@ body{
 }
 .list-item .first-line .mn-date{
     position: absolute;
+    font-size: 0.8rem;
+    font-style: italic;
 }
 .list-item .first-line .mn-btn{
     position: absolute;
@@ -79,7 +81,7 @@ body{
     color:black;
 }
 .list-item .first-line .mn-name{
-    padding: 0 40px 0 90px;
+    padding: 0 35px 0 90px;
 }
 
 .prayers-main-table{
@@ -667,6 +669,12 @@ footer .footer .contacts{
     .edit-form{background-color: darkseagreen;}
     .done-form{background-color: bisque;}
     .prayers-main-table .btn{margin: 5px;}
+    .list-item .first-line .mn-date{
+        font-size: 12px;
+    }
+    .list-item .first-line .mn-name{
+        padding: 0 25px 0 70px;
+    }
 }
 
 

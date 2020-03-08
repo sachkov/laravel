@@ -50,6 +50,8 @@ Route::post('/personal/changeGroupName', 'PersonalController@changeGroupName');
 
 Route::get('/personal/group/{id}', 'PersonalController@showGroup')->name('showGroup');
 
+Route::get('/personal/usersList/{count?}', 'PersonalController@usersList')->name('usersList');
+
 //Маршрут обработки ajax запросов
 Route::post('/ajax/saveMN', 'AjaxController@saveMN');
 

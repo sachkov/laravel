@@ -55,6 +55,8 @@
             <span class="d-screen">Создать</span>
             <span class="d-mobile">&nbsp;</span>
         </button>
+        <br>
+        <a href="{{ route('usersList') }}">Список всех пользователей</a>
     </div>
     <pre><?//print_r($groups)?></pre>
 @endsection
