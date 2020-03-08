@@ -391,7 +391,7 @@ class PersonalController extends Controller
     /**
      * Список всех пользователей на сайте
      */
-    public function usersList($count = 3)
+    public function usersList($count = 100)
     {
         $User = new User;
         $users = User::select('id', 'name', 'created_at')
