@@ -73,15 +73,13 @@ class AjaxController extends Controller
             if($request->input('mode') != '')
                 $sortBy = $request->input('mode');
 
-            $arGroupsId = [];           //массив групп где пользователь - админ
-            if($sortBy != "personal"){
-                $UG = DB::table("user_group")
-                    ->select("group_id")
-                    ->where("user_id", Auth::user()->id)
-                    ->where("admin", 1)
-                    ->get();
-                foreach($UG as $user) $arGroupsId[] = $user->group_id;
-            }
+            $arGroupsId = [];        //массив групп где пользователь - админ
+            $UG = DB::table("user_group")
+                ->select("group_id")
+                ->where("user_id", Auth::user()->id)
+                ->where("admin", 1)
+                ->get();
+            foreach($UG as $user) $arGroupsId[] = $user->group_id;
 
             $MN_model = new \App\Models\MN;
             $prayers = $MN_model::selectRaw('mn.*, count(mn_group.by_admin) as by_admin')
@@ -140,7 +138,7 @@ class AjaxController extends Controller
             $end = true;
             if($count==$num)$end = false;
             
-            $res = ["table"=>$table, "end"=>$end, "admin"=>(count($arGroupsId)>0)];
+            $res = ["table"=>$table, "end"=>$end, "admin"=>count($arGroupsId)>0];
         } 
         else {
             $res['error'] = 'У вас нет доступа';
@@ -186,7 +184,7 @@ class AjaxController extends Controller
             $month_day = intval($request->input('month_day'));
             if($week_day) $sсhedule = $week_day*100;
             if($month_day) $sсhedule += $month_day;
-            if($sсhedule) $MN_model->sсhedule = $sсhedule;
+            $MN_model->sсhedule = $sсhedule;
             $MN_model->save();
             $MN_model->signed_users()->sync(json_decode($request->input('users')));
             $MN_model->signed_groups()->sync(json_decode($request->input('groups')));
@@ -296,6 +294,7 @@ class AjaxController extends Controller
             ->where("mn.updated_at", "<", $updated_at)
             ->where(function($q){
                 $q->whereNull("mn.sсhedule")
+                    ->orWhere("mn.sсhedule", 0)
                     ->orWhere("mn.sсhedule", date('N')*100)
                     ->orWhere("mn.sсhedule", date('w')*100+date('j'))
                     ->orWhere("mn.sсhedule", date('j'));
@@ -319,6 +318,8 @@ class AjaxController extends Controller
         foreach($groups_id as $mn){
             $arG[$mn->id][] = $mn->group_id;
             $authors[] = $mn->author_id;
+            if($mn->by_admin)	    //Молитва добавлена администратором
+                $admin[] = $mn->id;
         }
 
         foreach($users as $umn){
