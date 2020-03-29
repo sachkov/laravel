@@ -52,6 +52,10 @@ Route::get('/personal/group/{id}', 'PersonalController@showGroup')->name('showGr
 
 Route::get('/personal/usersList/{count?}', 'PersonalController@usersList')->name('usersList');
 
+Route::get('/personal/settings', 'PersonalController@settings')->name('settings');
+
+Route::post('/personal/saveToken', 'PersonalController@saveToken');
+
 //Маршрут обработки ajax запросов
 Route::post('/ajax/saveMN', 'AjaxController@saveMN');
 

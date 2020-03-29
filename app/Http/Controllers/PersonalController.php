@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Auth;
 use App\User;
 use App\Models\Group;
+use App\Models\Push;
 
 class PersonalController extends Controller
 {
@@ -404,5 +405,34 @@ class PersonalController extends Controller
             $link = route('usersList',["count"=>$count+100]);
         
         return view("personal.usersList", ["users"=>$users, "nextLink"=>$link]);
+    }
+
+    /**
+     * Страница настроек
+     */
+    public function settings()
+    {
+        return view('personal.settings');
+    }
+
+    /**
+     * Сохранение токена пользователя
+     */
+    public function saveToken(Request $request)
+    {
+        if(Auth::check()){ 
+            $Push = new Push;
+            $Push->token = $request->input('token');
+            $Push->user_id = Auth::user()->id;
+            $Push->site = $request->input('site');
+
+            $Push->save();
+            
+            $out = ["save"=>true];
+        }else{
+            $out['error'] = 'У вас нет доступа';
+        }
+
+        return response()->json( $out );
     }
 }
