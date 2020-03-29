@@ -16,7 +16,7 @@ class CreatePushesTable extends Migration
         Schema::create('pushes', function (Blueprint $table) {
             $table->increments('id');
             $table->timestamps();
-            $table->string('token', 100)->nullable();
+            $table->string('token', 200)->nullable();
             $table->integer('user_id')->unsigned();
             $table->char('site', 10)->nullable();
         });
