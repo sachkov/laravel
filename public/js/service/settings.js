@@ -8,7 +8,7 @@ messaging.usePublicVapidKey(GFB.PublicVapidKey);
 
 $( document ).ready(function(){
     //Проверка дал ли пользователь разрешение на уведомления
-    console.log(Notification.permission);
+    //console.log(Notification.permission);
     if (Notification.permission === "granted") {
         $("#notification").prop("checked", true);
         $("#notification").prop("disabled", false);
