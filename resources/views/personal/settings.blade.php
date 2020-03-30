@@ -17,7 +17,14 @@
             </label>
         </div>
     </div>
-    <pre><?//print_r($groups)?></pre>
+    <pre>
+        <?//print_r($groups)?>
+    
+    </pre>
+    <?$d = str_replace("\n", "", file_get_contents("./../googlefirebase.json"));?>
+    <script>
+        let GFB = JSON.parse('<?=$d?>');
+    </script>
 @endsection
 
 

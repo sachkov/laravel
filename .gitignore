@@ -12,3 +12,5 @@ yarn-error.log
 .env
 config/app.php
 config/prop_app.php
+googlefirebase.json
+public/firebase-messaging-sw.js

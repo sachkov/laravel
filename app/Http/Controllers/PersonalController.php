@@ -421,14 +421,26 @@ class PersonalController extends Controller
     public function saveToken(Request $request)
     {
         if(Auth::check()){ 
+            //!! Найти пользователя и устройство, обновить
+            //Если не найдено - создать новую запись !!!
             $Push = new Push;
-            $Push->token = $request->input('token');
-            $Push->user_id = Auth::user()->id;
-            $Push->site = $request->input('site');
-
-            $Push->save();
+            $exist = \App\Models\Push::where([
+                ["user_id", Auth::user()->id],
+                ["site", $request->input('site')]
+            ])->first();
+            if($exist){
+                $exist->token = $request->input('token');
+                $exist->site = $request->input('site');
+                $exist->save();
+                $out = ["status"=>"updated"];
+            }else{
+                $Push->token = $request->input('token');
+                $Push->user_id = Auth::user()->id;
+                $Push->site = $request->input('site');
+                $Push->save();
+                $out = ["status"=>"created"];
+            }
             
-            $out = ["save"=>true];
         }else{
             $out['error'] = 'У вас нет доступа';
         }
